@@ -6,6 +6,7 @@ import { ApiError } from "@/api/client";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
+import { WakingServerNotice } from "@/components/WakingServerNotice";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -63,6 +64,7 @@ export function LoginPage() {
         <Button type="submit" size="lg" loading={submitting} disabled={!email || !password} className="mt-2">
           Iniciar sesión
         </Button>
+        {submitting && <WakingServerNotice />}
       </form>
 
       <p className="mt-6 text-center text-sm text-muted">

@@ -2,12 +2,16 @@ import type { ReactElement, ReactNode } from "react";
 import { Navigate, Outlet, useLocation } from "react-router";
 import type { UserRole } from "@/api/types";
 import { Spinner } from "@/components/ui/Spinner";
+import { WakingServerNotice } from "@/components/WakingServerNotice";
 import { useAuth } from "./AuthContext";
 
 function FullScreenLoader() {
   return (
-    <div className="flex min-h-dvh items-center justify-center text-brand-fg">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-brand-fg">
       <Spinner className="size-8" />
+      <div className="max-w-sm">
+        <WakingServerNotice />
+      </div>
     </div>
   );
 }
