@@ -16,6 +16,7 @@ import { ProductArt } from "@/features/catalog/ProductArt";
 import { ORDER_STATUS, RETURN_STATUS, SHIPMENT_STATUS } from "@/features/orders/labels";
 import { OrderProgress } from "@/features/orders/OrderProgress";
 import { ReturnForm } from "@/features/orders/ReturnForm";
+import { ShipmentTimeline } from "@/features/orders/ShipmentTimeline";
 import { errorMessage, notFoundAsNull } from "@/lib/errors";
 import { formatDateTime, formatMoney, shortId } from "@/lib/format";
 
@@ -118,16 +119,7 @@ function ShipmentCard({ order }: { order: Order }) {
             </span>
             <Badge tone={SHIPMENT_STATUS[shipment.status].tone}>{SHIPMENT_STATUS[shipment.status].label}</Badge>
           </div>
-          <ol className="space-y-3 border-l border-border pl-4">
-            {[...shipment.events].reverse().map((event, index) => (
-              <li key={index} className="relative">
-                <span className="absolute top-1.5 -left-[1.3rem] size-2 rounded-full bg-brand" />
-                <p className="font-medium">{SHIPMENT_STATUS[event.status].label}</p>
-                {event.note && <p className="text-muted">{event.note}</p>}
-                <p className="text-xs text-muted">{formatDateTime(event.createdAt)}</p>
-              </li>
-            ))}
-          </ol>
+          <ShipmentTimeline events={shipment.events} />
         </div>
       ) : (
         <p className="text-muted">El operador logístico aún no ha creado el envío.</p>

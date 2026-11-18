@@ -20,7 +20,9 @@ Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vended
 | Vendedor: productos, variantes y estado | ✅ |
 | Vendedor: bodegas e inventario (ingresos y unidades dañadas) | ✅ |
 | Vendedor: pedidos con sus productos y devoluciones (aprobar / rechazar) | ✅ |
-| Operador logístico, administrador y supervisor | Próximas fases |
+| Operador logístico: envíos (crear, despachar, entregar) con seguimiento | ✅ |
+| Operador logístico: inventario y bodegas de todo el marketplace | ✅ |
+| Administrador y supervisor | Próximas fases |
 
 ## Pantallas del comprador
 
@@ -47,6 +49,16 @@ Flujo: **completar perfil → agregar al carrito → confirmar pedido → pagar*
 | `/devoluciones` | Devoluciones de sus productos, con aprobación o rechazo |
 
 Flujo: (el administrador lo habilita como vendedor) → **crear bodega → crear producto → registrar ingreso** → el comprador compra → **revisar devoluciones**.
+
+## Pantallas del operador logístico
+
+| Ruta | Pantalla |
+|---|---|
+| `/envios` | Pedidos pagados por despachar (crear envío) y envíos por estado |
+| `/envios/:id` | Guía, contenido con bodega de origen, historial y siguiente paso (despachar / confirmar entrega) con nota |
+| `/inventario` | Existencias en cualquier bodega, ingresos y unidades dañadas; pestaña con todas las bodegas |
+
+Flujo: pedido pagado → **crear envío** (En preparación, con guía `NX-…`) → **despachar** (En tránsito: el pedido pasa a Enviado y las unidades salen del inventario) → **confirmar entrega** (Entregado). Cada paso puede llevar una nota que el comprador ve en su pedido.
 
 ## Stack
 
@@ -114,10 +126,10 @@ src/
 ├── auth/           # Sesión, guardias de ruta y configuración de roles
 ├── components/
 │   └── ui/         # Botón, campos, tarjeta, etiqueta, alerta, paginación…
-├── features/       # Piezas de cada módulo: catálogo, comprador, pedidos, vendedor (inventario)
+├── features/       # Piezas de cada módulo: catálogo, comprador, pedidos, vendedor (inventario), logística
 ├── layouts/        # Estructura con sesión (barra superior) y sin sesión (acceso)
 ├── lib/            # Utilidades: formato de moneda y fechas, clases, debounce
-├── pages/          # Una pantalla por ruta (pages/buyer, pages/seller)
+├── pages/          # Una pantalla por ruta (pages/buyer, pages/seller, pages/logistics)
 ├── theme/          # Tema claro/oscuro
 ├── index.css       # Paleta y estilos base
 ├── main.tsx        # Punto de entrada
@@ -141,5 +153,8 @@ src/
 - **La cuenta de vendedor la habilita el administrador.** Mientras `GET /api/sellers/:id` responda 404, las pantallas del vendedor explican que falta ese paso.
 - **El vendedor solo ve sus líneas** de cada pedido y su subtotal (lo filtra el backend). El envío lo gestiona el operador logístico.
 - **Aprobar o rechazar una devolución pide confirmación:** no se puede deshacer, y aprobar reingresa el stock y genera el reembolso.
+- **Despachar y entregar piden confirmación:** ninguno de los dos se puede deshacer, y despachar descuenta el inventario.
+- **En una bodega de vendedor solo se ingresan productos de ese vendedor** (en las del marketplace, de cualquiera). El backend lo permite, pero el formulario evita el error.
+- **El operador no ve la dirección del comprador:** el backend no le da acceso al perfil del comprador. Queda como mejora del backend.
 - **Al imprimir una factura** se ocultan la barra y los botones y se usa siempre la paleta clara.
 - **Sin imágenes de producto** (el backend aún no las guarda): cada producto muestra una ilustración según su tipo.

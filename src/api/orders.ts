@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { Invoice, Order, OrderStatus, Page, SellerOrder, Shipment } from "./types";
+import type { Invoice, Order, OrderStatus, Page, SellerOrder, Shipment, ShipmentStatus } from "./types";
 
 export type OrdersQuery = { status?: OrderStatus | undefined; page?: number; pageSize?: number };
 
@@ -25,6 +25,14 @@ export const invoicesApi = {
 };
 
 export const shipmentsApi = {
+  list: (query: { status?: ShipmentStatus | undefined; page?: number; pageSize?: number }, signal?: AbortSignal) =>
+    api<Page<Shipment>>("/api/shipments", { query, signal }),
+  get: (id: string, signal?: AbortSignal) => api<Shipment>(`/api/shipments/${encodeURIComponent(id)}`, { signal }),
+  // Solo para pedidos pagados y sin envío; nace "En preparación" con su número de guía
+  create: (orderId: string) => api<Shipment>("/api/shipments", { method: "POST", body: { orderId } }),
+  // PREPARING → IN_TRANSIT (el pedido pasa a Enviado y sale el inventario) → DELIVERED
+  updateStatus: (id: string, status: ShipmentStatus, note: string) =>
+    api<Shipment>(`/api/shipments/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status, note } }),
   byOrder: (orderId: string, signal?: AbortSignal) =>
     api<Shipment>(`/api/shipments/order/${encodeURIComponent(orderId)}`, { signal }),
 };

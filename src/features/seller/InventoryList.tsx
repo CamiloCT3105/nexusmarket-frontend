@@ -27,11 +27,13 @@ export function InventoryList({
   products,
   warehouses,
   hideProduct = false,
+  productHref = (id: string) => `/productos/${id}`,
 }: {
   items: InventoryItem[];
   products: Map<string, Product>;
   warehouses: Map<string, Warehouse>;
   hideProduct?: boolean;
+  productHref?: (productId: string) => string;
 }) {
   const [open, setOpen] = useState<{ key: string; mode: StockMode } | null>(null);
 
@@ -49,7 +51,7 @@ export function InventoryList({
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 {!hideProduct && (
-                  <Link to={`/productos/${item.productId}`} className="block truncate font-medium hover:text-brand-fg">
+                  <Link to={productHref(item.productId)} className="block truncate font-medium hover:text-brand-fg">
                     {product?.name ?? `Producto ${shortId(item.productId)}`}
                   </Link>
                 )}
