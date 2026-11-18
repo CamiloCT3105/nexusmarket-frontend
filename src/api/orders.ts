@@ -1,7 +1,8 @@
 import { api } from "./client";
 import type { Invoice, Order, OrderStatus, Page, SellerOrder, Shipment, ShipmentStatus } from "./types";
 
-export type OrdersQuery = { status?: OrderStatus | undefined; page?: number; pageSize?: number };
+// buyerId: solo administrador y supervisor (el comprador siempre recibe los suyos)
+export type OrdersQuery = { status?: OrderStatus | undefined; buyerId?: string | undefined; page?: number; pageSize?: number };
 
 export const ordersApi = {
   // El backend filtra por rol: un comprador solo recibe sus pedidos

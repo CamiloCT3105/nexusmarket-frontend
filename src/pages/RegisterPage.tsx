@@ -6,23 +6,7 @@ import { ApiError } from "@/api/client";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
-
-type Form = { fullName: string; email: string; documentNumber: string; password: string; confirm: string };
-type Errors = Partial<Record<keyof Form, string>>;
-
-// Mismas reglas que el backend, para avisar antes de enviar (el backend vuelve a validar)
-function validate(form: Form): Errors {
-  const errors: Errors = {};
-  if (!form.fullName.trim()) errors.fullName = "Escribe tu nombre completo.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errors.email = "Escribe un correo válido.";
-  const document = form.documentNumber.replace(/[\s.]/g, "").toUpperCase();
-  if (!/^[A-Z0-9-]{5,20}$/.test(document)) {
-    errors.documentNumber = "Entre 5 y 20 caracteres: letras, números o guiones.";
-  }
-  if (form.password.length < 8) errors.password = "Mínimo 8 caracteres.";
-  if (form.confirm !== form.password) errors.confirm = "Las contraseñas no coinciden.";
-  return errors;
-}
+import { validateNewUser as validate, type NewUserErrors as Errors, type NewUserForm as Form } from "@/lib/userValidation";
 
 export function RegisterPage() {
   const { register } = useAuth();

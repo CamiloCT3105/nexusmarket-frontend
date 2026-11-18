@@ -24,7 +24,7 @@ type Filter = ReturnStatus | "ALL";
 const STATUSES = Object.keys(RETURN_STATUS) as ReturnStatus[];
 
 // Aprobar es irreversible: reingresa las unidades a la bodega y genera el reembolso. Se pide confirmación.
-function Decision({ request }: { request: ReturnRequest }) {
+function Decision({ request, admin }: { request: ReturnRequest; admin: boolean }) {
   const queryClient = useQueryClient();
   const [confirm, setConfirm] = useState<boolean | null>(null);
   const decide = useMutation({
@@ -32,6 +32,7 @@ function Decision({ request }: { request: ReturnRequest }) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["returns"] });
       void queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      void queryClient.invalidateQueries({ queryKey: ["refunds"] });
     },
   });
 
@@ -40,7 +41,7 @@ function Decision({ request }: { request: ReturnRequest }) {
       <div className="mt-3 space-y-2 rounded-xl bg-surface-2/60 p-3 text-sm">
         <p>
           {confirm
-            ? `¿Aprobar? Las ${request.quantity} unidades vuelven a tu bodega y se genera el reembolso al comprador.`
+            ? `¿Aprobar? ${request.quantity === 1 ? "La unidad vuelve" : `Las ${request.quantity} unidades vuelven`} a ${admin ? "la bodega de origen" : "tu bodega"} y se genera el reembolso al comprador.`
             : "¿Rechazar la devolución? El comprador verá la solicitud como rechazada."}{" "}
           <span className="text-muted">No se puede deshacer.</span>
         </p>
@@ -69,7 +70,8 @@ function Decision({ request }: { request: ReturnRequest }) {
   );
 }
 
-export function SellerReturnsPage() {
+// Solicitudes de devolución. El vendedor ve las de sus productos; el administrador, todas.
+export function ReturnRequests({ admin = false }: { admin?: boolean }) {
   const [params, setParams] = useSearchParams();
   // Por defecto, lo que espera una decisión
   const raw = params.get("estado");
@@ -85,12 +87,21 @@ export function SellerReturnsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Devoluciones" description="Solicitudes sobre tus productos. Al aprobar, el stock vuelve a la bodega de origen y se reembolsa lo pagado." />
-
       <Segmented<Filter>
         label="Filtrar por estado"
         value={status ?? "ALL"}
-        onChange={(next) => setParams(next === "REQUESTED" ? {} : { estado: next === "ALL" ? "todas" : next }, { replace: true })}
+        onChange={(next) =>
+          setParams(
+            (current) => {
+              const updated = new URLSearchParams(current);
+              if (next === "REQUESTED") updated.delete("estado");
+              else updated.set("estado", next === "ALL" ? "todas" : next);
+              updated.delete("pagina");
+              return updated;
+            },
+            { replace: true }
+          )
+        }
         options={[...STATUSES.map((value) => ({ value, label: value === "REQUESTED" ? "Por revisar" : RETURN_STATUS[value].label })), { value: "ALL", label: "Todas" }]}
       />
 
@@ -112,7 +123,7 @@ export function SellerReturnsPage() {
                 <div className="min-w-0">
                   <p className="font-medium">
                     {request.quantity} ×{" "}
-                    <Link to={`/productos/${request.productId}`} className="hover:text-brand-fg">
+                    <Link to={admin ? `/catalogo/${request.productId}` : `/productos/${request.productId}`} className="hover:text-brand-fg">
                       {products.get(request.productId)?.name ?? `Producto ${shortId(request.productId)}`}
                     </Link>
                   </p>
@@ -126,7 +137,7 @@ export function SellerReturnsPage() {
                   Pedido #{shortId(request.orderId)}
                 </Link>
               </p>
-              {request.status === "REQUESTED" && <Decision request={request} />}
+              {request.status === "REQUESTED" && <Decision request={request} admin={admin} />}
             </Card>
           ))}
           <div className="pt-4">
@@ -151,6 +162,15 @@ export function SellerReturnsPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+export function SellerReturnsPage() {
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Devoluciones" description="Solicitudes sobre tus productos. Al aprobar, el stock vuelve a la bodega de origen y se reembolsa lo pagado." />
+      <ReturnRequests />
     </div>
   );
 }

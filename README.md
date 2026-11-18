@@ -22,7 +22,10 @@ Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vended
 | Vendedor: pedidos con sus productos y devoluciones (aprobar / rechazar) | ✅ |
 | Operador logístico: envíos (crear, despachar, entregar) con seguimiento | ✅ |
 | Operador logístico: inventario y bodegas de todo el marketplace | ✅ |
-| Administrador y supervisor | Próximas fases |
+| Administrador: usuarios (crear, bloquear, cambiar rol) y cuentas de vendedor | ✅ |
+| Administrador: pedidos, facturación, devoluciones y reembolsos | ✅ |
+| Administrador: bodegas (crear, reasignar), envíos y moderación de productos | ✅ |
+| Supervisor y reportes | Próxima fase |
 
 ## Pantallas del comprador
 
@@ -59,6 +62,22 @@ Flujo: (el administrador lo habilita como vendedor) → **crear bodega → crear
 | `/inventario` | Existencias en cualquier bodega, ingresos y unidades dañadas; pestaña con todas las bodegas |
 
 Flujo: pedido pagado → **crear envío** (En preparación, con guía `NX-…`) → **despachar** (En tránsito: el pedido pasa a Enviado y las unidades salen del inventario) → **confirmar entrega** (Entregado). Cada paso puede llevar una nota que el comprador ve en su pedido.
+
+## Pantallas del administrador
+
+| Ruta | Pantalla |
+|---|---|
+| `/usuarios` | Usuarios con búsqueda y filtros por rol y estado |
+| `/usuarios/nuevo` | Crear usuario de cualquier rol con contraseña inicial |
+| `/usuarios/:id` | Bloquear / desbloquear, cambiar rol; vendedor: habilitar cuenta, bodegas y productos; comprador: dirección, estado comercial y pedidos |
+| `/pedidos`, `/pedidos/:id` | Todos los pedidos (filtro por estado y comprador); el detalle genera la factura y muestra envío y devoluciones |
+| `/facturas`, `/facturas/:id` | Todas las facturas, con los datos del cliente |
+| `/devoluciones` | Solicitudes de cualquier vendedor (aprobar / rechazar) y reembolsos por pagar (marcar como completados) |
+| `/inventario` | Lo mismo que el operador logístico, más crear bodegas (marketplace o de un vendedor) y reasignarlas |
+| `/envios` | Las mismas pantallas del operador logístico |
+| `/catalogo/:id` | Moderación: publicar, suspender o descontinuar cualquier producto |
+
+Flujo para incorporar un vendedor: **crear usuario** con rol Vendedor → **habilitar como vendedor** → **crear su bodega** → el vendedor ya puede publicar e ingresar mercancía.
 
 ## Stack
 
@@ -126,10 +145,10 @@ src/
 ├── auth/           # Sesión, guardias de ruta y configuración de roles
 ├── components/
 │   └── ui/         # Botón, campos, tarjeta, etiqueta, alerta, paginación…
-├── features/       # Piezas de cada módulo: catálogo, comprador, pedidos, vendedor (inventario), logística
+├── features/       # Piezas de cada módulo: catálogo, comprador, pedidos, vendedor (inventario), logística, administrador
 ├── layouts/        # Estructura con sesión (barra superior) y sin sesión (acceso)
 ├── lib/            # Utilidades: formato de moneda y fechas, clases, debounce
-├── pages/          # Una pantalla por ruta (pages/buyer, pages/seller, pages/logistics)
+├── pages/          # Una pantalla por ruta (pages/buyer, pages/seller, pages/logistics, pages/admin)
 ├── theme/          # Tema claro/oscuro
 ├── index.css       # Paleta y estilos base
 ├── main.tsx        # Punto de entrada
@@ -156,5 +175,11 @@ src/
 - **Despachar y entregar piden confirmación:** ninguno de los dos se puede deshacer, y despachar descuenta el inventario.
 - **En una bodega de vendedor solo se ingresan productos de ese vendedor** (en las del marketplace, de cualquiera). El backend lo permite, pero el formulario evita el error.
 - **El operador no ve la dirección del comprador:** el backend no le da acceso al perfil del comprador. Queda como mejora del backend.
+- **Las facturas no se generan solas al pagar:** las emite el administrador desde el detalle del pedido (así lo define el backend).
+- **El administrador no puede bloquearse ni cambiarse el rol a sí mismo,** para no quedarse sin acceso. El backend no lo impide; lo evita la interfaz.
+- **Bloquear, cambiar rol, completar un reembolso, reasignar una bodega o moderar un producto piden confirmación.** El cambio de rol aplica de inmediato porque el backend lee el rol actual en cada petición.
+- **El estado comercial "restringido" es solo una marca:** el backend no limita las compras de un comprador restringido, y la interfaz lo dice al confirmar.
+- **Reasignar una bodega no cambia el dueño de lo que ya tiene guardado:** la interfaz lo advierte y lo recomienda para bodegas vacías o mal asignadas.
+- **Con muchas secciones (administrador), la barra completa aparece desde 1280 px;** en pantallas menores se usa el menú.
 - **Al imprimir una factura** se ocultan la barra y los botones y se usa siempre la paleta clara.
 - **Sin imágenes de producto** (el backend aún no las guarda): cada producto muestra una ilustración según su tipo.

@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Printer } from "lucide-react";
+import { buyersApi } from "@/api/buyers";
 import { invoicesApi, ordersApi } from "@/api/orders";
 import { useCurrentUser } from "@/auth/AuthContext";
 import { Logo } from "@/components/Logo";
@@ -8,17 +9,29 @@ import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { useUsersById } from "@/features/admin/hooks";
 import { formatAddress } from "@/features/buyer/AddressForm";
 import { useBuyerProfile, useProductsById } from "@/features/buyer/hooks";
-import { errorMessage } from "@/lib/errors";
+import { errorMessage, notFoundAsNull } from "@/lib/errors";
 import { formatDateTime, formatMoney, shortId } from "@/lib/format";
 
 // Factura lista para imprimir o guardar como PDF (al imprimir se ocultan la barra y los botones)
 export function InvoiceDetailPage() {
   const { id = "" } = useParams();
-  const user = useCurrentUser();
-  const profile = useBuyerProfile();
+  const me = useCurrentUser();
+  const staff = me.role !== "BUYER";
+  const ownProfile = useBuyerProfile();
   const invoice = useQuery({ queryKey: ["invoice", id], queryFn: ({ signal }) => invoicesApi.get(id, signal) });
+  // El administrador ve la factura de cualquier cliente: datos y dirección del comprador de la factura
+  const buyerId = invoice.data?.buyerId;
+  const clientProfile = useQuery({
+    queryKey: ["buyer", buyerId],
+    enabled: staff && Boolean(buyerId),
+    queryFn: ({ signal }) => notFoundAsNull(buyersApi.get(buyerId ?? "", signal)),
+  });
+  const clients = useUsersById(staff && buyerId ? [buyerId] : []);
+  const user = staff ? (buyerId ? clients.get(buyerId) : undefined) : me;
+  const profile = staff ? clientProfile : ownProfile;
   const orderId = invoice.data?.orderId;
   const order = useQuery({
     queryKey: ["order", orderId],
@@ -29,7 +42,7 @@ export function InvoiceDetailPage() {
 
   const back = (
     <Link to="/facturas" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg print:hidden">
-      <ArrowLeft className="size-4" /> Mis facturas
+      <ArrowLeft className="size-4" /> {staff ? "Facturas" : "Mis facturas"}
     </Link>
   );
 
@@ -70,9 +83,15 @@ export function InvoiceDetailPage() {
         <div className="mt-8 grid gap-6 text-sm sm:grid-cols-2">
           <div>
             <p className="text-xs tracking-widest text-muted uppercase">Cliente</p>
-            <p className="mt-1 font-medium">{user.fullName}</p>
-            <p className="text-muted">Documento {user.documentNumber}</p>
-            <p className="text-muted">{user.email}</p>
+            {user ? (
+              <>
+                <p className="mt-1 font-medium">{user.fullName}</p>
+                <p className="text-muted">Documento {user.documentNumber}</p>
+                <p className="text-muted">{user.email}</p>
+              </>
+            ) : (
+              <p className="mt-1 text-muted">Cliente #{shortId(data.buyerId)}</p>
+            )}
             {profile.data && <p className="text-muted">{formatAddress(profile.data.primaryAddress)}</p>}
           </div>
           <div className="sm:text-right">

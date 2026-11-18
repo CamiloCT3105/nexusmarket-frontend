@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Boxes, MapPin, PackagePlus, Store, Warehouse as WarehouseIcon } from "lucide-react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Boxes, MapPin, PackagePlus, Plus, Store, Warehouse as WarehouseIcon } from "lucide-react";
+import { adminWarehousesApi, usersApi } from "@/api/admin";
 import { productsApi } from "@/api/products";
 import { inventoryApi } from "@/api/seller";
 import type { Warehouse, WarehouseType } from "@/api/types";
@@ -11,10 +12,13 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Select } from "@/components/ui/Field";
+import { Input, Select } from "@/components/ui/Field";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Pagination } from "@/components/ui/Pagination";
 import { Segmented } from "@/components/ui/Segmented";
+import { useCurrentUser } from "@/auth/AuthContext";
+import { Confirm } from "@/features/admin/Confirm";
+import { useUsersById } from "@/features/admin/hooks";
 import { useProductsById } from "@/features/buyer/hooks";
 import { useAllWarehouses } from "@/features/logistics/hooks";
 import { InventoryList } from "@/features/seller/InventoryList";
@@ -144,29 +148,160 @@ function StockView({ warehouses }: { warehouses: Warehouse[] }) {
   );
 }
 
+// Vendedores para los selectores del administrador (backend: máximo 100 por página)
+function useSellerUsers() {
+  return useQuery({
+    queryKey: ["users", { role: "SELLER", pageSize: 100 }],
+    queryFn: ({ signal }) => usersApi.list({ role: "SELLER", pageSize: 100 }, signal),
+    select: (page) => page.items,
+  });
+}
+
+// Administrador: bodegas del marketplace o de un vendedor
+function NewWarehouseCard({ onClose }: { onClose: () => void }) {
+  const queryClient = useQueryClient();
+  const sellers = useSellerUsers();
+  const [type, setType] = useState<WarehouseType>("MARKETPLACE");
+  const [location, setLocation] = useState("");
+  const [sellerId, setSellerId] = useState("");
+  const [error, setError] = useState<string | undefined>();
+  const owner = sellerId || sellers.data?.[0]?.id || "";
+  const create = useMutation({
+    mutationFn: () => adminWarehousesApi.create({ type, location: location.trim(), ...(type === "SELLER" ? { sellerId: owner } : {}) }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      onClose();
+    },
+  });
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!location.trim()) {
+      setError("Escribe la ubicación de la bodega.");
+      return;
+    }
+    setError(undefined);
+    create.mutate();
+  };
+
+  return (
+    <Card className="p-5">
+      <h2 className="mb-3 font-semibold">Nueva bodega</h2>
+      <form onSubmit={submit} noValidate className="space-y-3">
+        <Segmented<WarehouseType>
+          label="Tipo de bodega"
+          value={type}
+          onChange={setType}
+          options={[
+            { value: "MARKETPLACE", label: "Del marketplace" },
+            { value: "SELLER", label: "De un vendedor" },
+          ]}
+        />
+        <p className="text-xs text-muted">
+          {type === "MARKETPLACE" ? "Recibe productos de cualquier vendedor." : "Solo guarda productos del vendedor dueño."}
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Input label="Ubicación" placeholder="Ciudad o dirección" value={location} onChange={(event) => setLocation(event.target.value)} error={error} />
+          {type === "SELLER" &&
+            (sellers.isPending ? (
+              <PageLoader />
+            ) : (sellers.data ?? []).length === 0 ? (
+              <Alert tone="info">No hay usuarios con rol vendedor.</Alert>
+            ) : (
+              <Select
+                label="Vendedor"
+                value={owner}
+                onChange={(event) => setSellerId(event.target.value)}
+                options={(sellers.data ?? []).map((user) => ({ value: user.id, label: user.fullName }))}
+              />
+            ))}
+        </div>
+        {create.error && <Alert tone="error">{errorMessage(create.error, "No se pudo crear la bodega.")}</Alert>}
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" size="sm" loading={create.isPending} disabled={type === "SELLER" && !owner}>
+            Crear bodega
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+// Administrador: pasar una bodega de vendedor a otro vendedor (sus existencias se quedan en la bodega)
+function Reassign({ warehouse, onClose }: { warehouse: Warehouse; onClose: () => void }) {
+  const queryClient = useQueryClient();
+  const sellers = useSellerUsers();
+  const options = (sellers.data ?? []).filter((user) => user.id !== warehouse.sellerId);
+  const [sellerId, setSellerId] = useState("");
+  const target = sellerId || options[0]?.id || "";
+  const link = useMutation({
+    mutationFn: () => adminWarehousesApi.linkToSeller(warehouse.id, target),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      onClose();
+    },
+  });
+  if (sellers.isPending) return <PageLoader />;
+  if (options.length === 0) {
+    return (
+      <div className="space-y-2">
+        <Alert tone="info">No hay otro vendedor al que pasarla.</Alert>
+        <Button size="sm" variant="ghost" onClick={onClose}>
+          Cerrar
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      <Select label="Nuevo dueño" value={target} onChange={(event) => setSellerId(event.target.value)} options={options.map((user) => ({ value: user.id, label: user.fullName }))} />
+      <Confirm confirmLabel="Sí, reasignar" loading={link.isPending} error={link.error} onConfirm={() => link.mutate()} onCancel={onClose}>
+        La bodega pasa al vendedor elegido y desde ahí solo recibirá productos suyos. Lo que ya tenga guardado no cambia de dueño: úsalo para bodegas vacías o mal asignadas.
+      </Confirm>
+    </div>
+  );
+}
+
 function WarehousesView({ warehouses }: { warehouses: Warehouse[] }) {
+  const isAdmin = useCurrentUser().role === "ADMIN";
   const [, setParams] = useSearchParams();
   const [type, setType] = useState<WarehouseType | "ALL">("ALL");
+  const [creating, setCreating] = useState(false);
+  const [reassigning, setReassigning] = useState<string | null>(null);
   const shown = type === "ALL" ? warehouses : warehouses.filter((warehouse) => warehouse.type === type);
+  // El operador logístico no puede consultar usuarios: solo el administrador ve el nombre del dueño
+  const owners = useUsersById(isAdmin ? warehouses.flatMap((warehouse) => (warehouse.sellerId ? [warehouse.sellerId] : [])) : []);
 
   return (
     <div className="space-y-4">
-      <Segmented<WarehouseType | "ALL">
-        label="Filtrar por tipo"
-        value={type}
-        onChange={setType}
-        options={[
-          { value: "ALL", label: "Todas" },
-          { value: "MARKETPLACE", label: "Marketplace" },
-          { value: "SELLER", label: "De vendedores" },
-        ]}
-      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Segmented<WarehouseType | "ALL">
+          label="Filtrar por tipo"
+          value={type}
+          onChange={setType}
+          options={[
+            { value: "ALL", label: "Todas" },
+            { value: "MARKETPLACE", label: "Marketplace" },
+            { value: "SELLER", label: "De vendedores" },
+          ]}
+        />
+        {isAdmin && !creating && (
+          <Button icon={<Plus className="size-4" />} onClick={() => setCreating(true)}>
+            Nueva bodega
+          </Button>
+        )}
+      </div>
+      {creating && <NewWarehouseCard onClose={() => setCreating(false)} />}
       {shown.length === 0 ? (
         <EmptyState icon={<WarehouseIcon className="size-6" />} title="No hay bodegas de este tipo" />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((warehouse) => {
             const Icon = TYPE_INFO[warehouse.type].icon;
+            const owner = warehouse.sellerId ? owners.get(warehouse.sellerId) : undefined;
             return (
               <Card key={warehouse.id} className="flex flex-col gap-3 p-4">
                 <div className="flex items-start gap-3">
@@ -179,13 +314,24 @@ function WarehousesView({ warehouses }: { warehouses: Warehouse[] }) {
                       <Badge>
                         <Icon className="size-3" /> {TYPE_INFO[warehouse.type].label}
                       </Badge>
-                      {shortId(warehouse.id)}
+                      {owner ? owner.fullName : warehouse.type === "SELLER" ? `Vendedor ${shortId(warehouse.sellerId ?? "")}` : null}
                     </p>
                   </div>
                 </div>
-                <Button size="sm" variant="secondary" className="self-end" onClick={() => setParams({ bodega: warehouse.id }, { replace: true })}>
-                  Ver existencias
-                </Button>
+                {reassigning === warehouse.id ? (
+                  <Reassign warehouse={warehouse} onClose={() => setReassigning(null)} />
+                ) : (
+                  <div className="mt-auto flex justify-end gap-2">
+                    {isAdmin && warehouse.type === "SELLER" && (
+                      <Button size="sm" variant="ghost" onClick={() => setReassigning(warehouse.id)}>
+                        Reasignar
+                      </Button>
+                    )}
+                    <Button size="sm" variant="secondary" onClick={() => setParams({ bodega: warehouse.id }, { replace: true })}>
+                      Ver existencias
+                    </Button>
+                  </div>
+                )}
               </Card>
             );
           })}
@@ -195,7 +341,9 @@ function WarehousesView({ warehouses }: { warehouses: Warehouse[] }) {
   );
 }
 
+// Operador logístico y administrador (el administrador además crea y reasigna bodegas)
 export function LogisticsInventoryPage() {
+  const isAdmin = useCurrentUser().role === "ADMIN";
   const [params, setParams] = useSearchParams();
   const view: View = params.get("vista") === "bodegas" ? "bodegas" : "existencias";
   const warehouses = useAllWarehouses();
@@ -204,7 +352,11 @@ export function LogisticsInventoryPage() {
     <div className="space-y-6">
       <PageHeader
         title="Inventario"
-        description="Existencias en todas las bodegas del marketplace y de los vendedores."
+        description={
+          isAdmin
+            ? "Existencias en todas las bodegas. Crea bodegas del marketplace o de vendedores y reasígnalas."
+            : "Existencias en todas las bodegas del marketplace y de los vendedores."
+        }
         actions={
           <Segmented<View>
             label="Vista"
