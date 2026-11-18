@@ -12,8 +12,25 @@ Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vended
 | Catálogo: búsqueda, filtros, orden, paginación y visibilidad por rol | ✅ |
 | Detalle de producto con variantes | ✅ |
 | Tema claro / oscuro | ✅ |
-| Comprador: perfil, carrito, checkout, pedidos, devoluciones | Próxima fase |
+| Comprador: perfil y direcciones | ✅ |
+| Comprador: carrito y checkout | ✅ |
+| Comprador: pedidos (pago simulado, factura y seguimiento del envío) | ✅ |
+| Comprador: facturas imprimibles | ✅ |
+| Comprador: devoluciones y reembolsos | ✅ |
 | Vendedor, operador logístico, administrador y supervisor | Próximas fases |
+
+## Pantallas del comprador
+
+| Ruta | Pantalla |
+|---|---|
+| `/perfil` | Datos de la cuenta, perfil de comprador y direcciones |
+| `/carrito` | Carrito con cantidades, resumen y confirmación del pedido |
+| `/pedidos` | Pedidos con filtro por estado |
+| `/pedidos/:id` | Detalle: progreso, pago, factura, envío y solicitud de devoluciones |
+| `/facturas`, `/facturas/:id` | Facturas; el detalle se puede imprimir o guardar como PDF |
+| `/devoluciones` | Devoluciones y reembolsos |
+
+Flujo: **completar perfil → agregar al carrito → confirmar pedido → pagar** → (el administrador emite la factura y el operador logístico despacha y entrega) → **solicitar devolución** → (el vendedor la aprueba y se genera el reembolso).
 
 ## Stack
 
@@ -81,10 +98,10 @@ src/
 ├── auth/           # Sesión, guardias de ruta y configuración de roles
 ├── components/
 │   └── ui/         # Botón, campos, tarjeta, etiqueta, alerta, paginación…
-├── features/       # Piezas de cada módulo (catálogo: tarjeta, ilustración, etiquetas)
+├── features/       # Piezas de cada módulo: catálogo, comprador (perfil, carrito), pedidos
 ├── layouts/        # Estructura con sesión (barra superior) y sin sesión (acceso)
 ├── lib/            # Utilidades: formato de moneda y fechas, clases, debounce
-├── pages/          # Una pantalla por ruta
+├── pages/          # Una pantalla por ruta (pages/buyer: pantallas del comprador)
 ├── theme/          # Tema claro/oscuro
 ├── index.css       # Paleta y estilos base
 ├── main.tsx        # Punto de entrada
@@ -99,4 +116,10 @@ src/
 - **Los filtros del catálogo viven en la URL** (`/catalogo?q=…&tipo=…&pagina=…`): se pueden compartir, el botón atrás funciona y sobreviven a una recarga.
 - **Formato de página común** de la API (`{ items, page, pageSize, total, totalPages }`): un solo componente `Pagination` para todos los listados.
 - **Validación doble en formularios:** se avisa en pantalla con las mismas reglas del backend, pero el mensaje final siempre es el del servidor.
+- **El perfil de comprador es un paso aparte.** Registrarse crea la cuenta, pero el backend exige un perfil con dirección principal para usar el carrito. El frontend lo detecta (404) y guía a `/perfil` antes de comprar.
+- **Carrito, pedidos y devoluciones guardan solo ids de producto:** los nombres se consultan aparte y se reutiliza la misma caché del detalle del producto.
+- **El total del carrito es informativo:** usa el precio actual del catálogo; el precio definitivo lo fija el backend al confirmar el pedido.
+- **El pago es simulado** (`POST /api/orders/:id/pay`): no se pide ningún medio de pago.
+- **Factura y envío pueden no existir todavía:** un 404 se muestra como "pendiente", no como error.
+- **Al imprimir una factura** se ocultan la barra y los botones y se usa siempre la paleta clara.
 - **Sin imágenes de producto** (el backend aún no las guarda): cada producto muestra una ilustración según su tipo.

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
@@ -9,9 +10,67 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
+import { useCart, useCartActions } from "@/features/buyer/hooks";
+import { QuantityStepper } from "@/features/buyer/QuantityStepper";
 import { ProductArt } from "@/features/catalog/ProductArt";
+import { errorMessage } from "@/lib/errors";
 import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL } from "@/features/catalog/productLabels";
 import { formatMoney, shortId } from "@/lib/format";
+
+// Comprador: elegir cantidad y agregar. Sin perfil de comprador, el backend no permite carrito.
+function AddToCart({ productId }: { productId: string }) {
+  const cart = useCart();
+  const { add } = useCartActions();
+  const [quantity, setQuantity] = useState(1);
+  const inCart = cart.data?.items.find((item) => item.productId === productId)?.quantity ?? 0;
+
+  if (cart.profileLoading) return null;
+  if (!cart.hasProfile) {
+    return (
+      <Alert tone="info">
+        Para comprar, primero{" "}
+        <Link to="/perfil" className="font-medium underline underline-offset-2">
+          completa tu perfil con una dirección de entrega
+        </Link>
+        .
+      </Alert>
+    );
+  }
+
+  return (
+    <div className="mt-2 space-y-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <QuantityStepper value={quantity} onChange={setQuantity} disabled={add.isPending} className="h-12 px-1" />
+        <Button
+          size="lg"
+          loading={add.isPending}
+          icon={<ShoppingCart className="size-5" />}
+          onClick={() => add.mutate({ productId, quantity }, { onSuccess: () => setQuantity(1) })}
+        >
+          Agregar al carrito
+        </Button>
+      </div>
+      {add.error && <Alert tone="error">{errorMessage(add.error, "No se pudo agregar al carrito.")}</Alert>}
+      {add.isSuccess && (
+        <Alert tone="success">
+          Agregado. Tienes {inCart} {inCart === 1 ? "unidad" : "unidades"} en el carrito ·{" "}
+          <Link to="/carrito" className="font-medium underline underline-offset-2">
+            Ver carrito
+          </Link>
+        </Alert>
+      )}
+      {!add.isSuccess && inCart > 0 && (
+        <p className="text-sm text-muted">
+          Ya tienes {inCart} en tu{" "}
+          <Link to="/carrito" className="text-brand-fg hover:underline">
+            carrito
+          </Link>
+          .
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function ProductDetailPage() {
   const { id = "" } = useParams();
@@ -81,14 +140,7 @@ export function ProductDetailPage() {
             </div>
           )}
 
-          {user.role === "BUYER" && product.status === "PUBLISHED" && (
-            <div className="mt-2">
-              <Button size="lg" disabled icon={<ShoppingCart className="size-5" />} title="El carrito llega en la siguiente fase">
-                Agregar al carrito
-              </Button>
-              <p className="mt-2 text-xs text-muted">El carrito y el checkout se habilitan en la siguiente fase.</p>
-            </div>
-          )}
+          {user.role === "BUYER" && product.status === "PUBLISHED" && <AddToCart productId={product.id} />}
 
           <p className="text-xs text-muted">Código del producto: {shortId(product.id)}</p>
         </div>

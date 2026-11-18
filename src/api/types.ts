@@ -40,3 +40,53 @@ export type Page<T> = {
 };
 
 export type LoginResponse = { token: string; user: User };
+
+// ─── Comprador ─────────────────────────────────────────────────────────────────
+
+export type Address = { street: string; city: string; country: string; postalCode: string };
+export type CommercialStatus = "ACTIVE" | "RESTRICTED";
+
+export type Buyer = {
+  userId: string;
+  primaryAddress: Address;
+  additionalAddresses: Address[];
+  commercialStatus: CommercialStatus;
+};
+
+export type CartItem = { productId: string; quantity: number };
+export type Cart = { buyerId: string; items: CartItem[] };
+
+// ─── Pedidos y posventa ────────────────────────────────────────────────────────
+
+export type OrderStatus = "PENDING_PAYMENT" | "PAID" | "SHIPPED" | "DELIVERED";
+
+export type OrderItem = { productId: string; warehouseId: string; quantity: number; unitPrice: number };
+
+export type Order = {
+  id: string;
+  buyerId: string;
+  items: OrderItem[];
+  total: number;
+  status: OrderStatus;
+  createdAt: string;
+};
+
+export type Invoice = { id: string; orderId: string; buyerId: string; amount: number; issuedAt: string };
+
+export type ShipmentStatus = "PREPARING" | "IN_TRANSIT" | "DELIVERED";
+export type ShipmentEvent = { status: ShipmentStatus; note: string; createdAt: string };
+export type Shipment = { id: string; orderId: string; trackingCode: string; status: ShipmentStatus; events: ShipmentEvent[] };
+
+export type ReturnStatus = "REQUESTED" | "APPROVED" | "REJECTED";
+export type ReturnRequest = {
+  id: string;
+  orderId: string;
+  productId: string;
+  quantity: number;
+  reason: string;
+  status: ReturnStatus;
+  createdAt: string;
+};
+
+export type RefundStatus = "PENDING" | "COMPLETED";
+export type Refund = { id: string; returnId: string; amount: number; status: RefundStatus; createdAt: string };

@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
+import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
 const control =
@@ -83,6 +83,28 @@ export function Select({ label, options, className, id, ...rest }: SelectProps) 
           </option>
         ))}
       </select>
+    </FieldWrapper>
+  );
+}
+
+type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  label?: string;
+  hint?: string;
+  error?: string | undefined;
+};
+
+export function Textarea({ label, hint, error, className, id, ...rest }: TextareaProps) {
+  const autoId = useId();
+  const textareaId = id ?? autoId;
+  return (
+    <FieldWrapper label={label ?? ""} hint={hint ?? ""} error={error} id={textareaId}>
+      <textarea
+        id={textareaId}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error || hint ? `${textareaId}-msg` : undefined}
+        className={cn(control, "h-auto min-h-24 resize-y py-2", className)}
+        {...rest}
+      />
     </FieldWrapper>
   );
 }

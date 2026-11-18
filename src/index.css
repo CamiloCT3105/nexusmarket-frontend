@@ -141,3 +141,22 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Al imprimir (facturas) siempre se usa la paleta clara: papel blanco, texto oscuro, sin halo */
+@media print {
+  :root,
+  [data-theme="dark"] {
+    --app-bg: #ffffff;
+    --app-surface: #ffffff;
+    --app-surface-2: #f0f0f4;
+    --app-border: #d4d4dc;
+    --app-fg: #111116;
+    --app-muted: #55556a;
+    --app-brand-fg: #6d28d9;
+    --app-shadow: none;
+    color-scheme: light;
+  }
+  body {
+    background: #ffffff !important;
+  }
+}
