@@ -94,15 +94,16 @@ jobs:
         working-directory: backend
         env:
           PORT: "3000"
-          NODE_ENV: production
           CORS_ORIGIN: http://localhost:5173
           ADMIN_EMAIL: admin@ci.test
           ADMIN_DOCUMENT_NUMBER: "1000000000"
+        # NODE_ENV=production solo al arrancar: si se define antes, npm ci omite las dependencias
+        # de desarrollo (TypeScript y sus tipos) y la compilación del backend falla
         run: |
           npm ci
           npx prisma migrate deploy
           npm run build
-          ADMIN_PASSWORD="$E2E_ADMIN_PASSWORD" nohup node dist/index.js > ../backend.log 2>&1 &
+          ADMIN_PASSWORD="$E2E_ADMIN_PASSWORD" NODE_ENV=production nohup node dist/index.js > ../backend.log 2>&1 &
           npx --yes wait-on@8.0.5 --timeout 60000 tcp:localhost:3000
 
       - run: npm ci
