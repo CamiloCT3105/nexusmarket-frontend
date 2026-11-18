@@ -32,7 +32,7 @@ function usePageParam(params: URLSearchParams, setParams: ReturnType<typeof useS
         else updated.delete("pagina");
         return updated;
       },
-      { replace: true }
+      { replace: true },
     );
     window.scrollTo({ top: 0, behavior: "smooth" });
   };

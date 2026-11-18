@@ -9,8 +9,7 @@ export type RegisterInput = {
 };
 
 export const authApi = {
-  login: (email: string, password: string) =>
-    api<LoginResponse>("/api/auth/login", { method: "POST", body: { email, password } }),
+  login: (email: string, password: string) => api<LoginResponse>("/api/auth/login", { method: "POST", body: { email, password } }),
 
   // El registro público siempre crea compradores (el backend ignora cualquier rol enviado)
   register: (input: RegisterInput) => api<User>("/api/auth/register", { method: "POST", body: input }),

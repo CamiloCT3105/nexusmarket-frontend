@@ -84,8 +84,9 @@ export function StockForm({
           options={warehouses.map((item) => ({ value: item.id, label: item.location }))}
         />
       )}
-      {!fixedProduct && options && (
-        options.length > 0 ? (
+      {!fixedProduct &&
+        options &&
+        (options.length > 0 ? (
           <Select
             label="Producto"
             value={productId}
@@ -94,8 +95,7 @@ export function StockForm({
           />
         ) : (
           <Alert tone="info">No hay productos publicados que puedan ingresar a esta bodega.</Alert>
-        )
-      )}
+        ))}
       <Input
         label={COPY[mode].quantity}
         hint={COPY[mode].hint}

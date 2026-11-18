@@ -57,18 +57,20 @@ export function CatalogPage() {
         if (resetPage) next.delete("pagina");
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
   };
 
   // Lleva a la URL lo escrito (sin crear una entrada de historial por cada tecla)
   useEffect(() => {
     if ((params.get("q") ?? "") !== debouncedSearch) update({ q: debouncedSearch });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reacciona solo al texto ya asentado; con más dependencias, limpiar los filtros devolvería el texto viejo
   }, [debouncedSearch]);
   useEffect(() => {
     if ((params.get("min") ?? "") !== debouncedMin || (params.get("max") ?? "") !== debouncedMax) {
       update({ min: debouncedMin, max: debouncedMax });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reacciona solo al texto ya asentado; con más dependencias, limpiar los filtros devolvería el texto viejo
   }, [debouncedMin, debouncedMax]);
 
   const query: CatalogQuery = {
@@ -148,7 +150,7 @@ export function CatalogPage() {
                   onClick={() => update({ tipo: option.value })}
                   className={cn(
                     "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-                    active ? "bg-surface text-fg shadow-sm" : "text-muted hover:text-fg"
+                    active ? "bg-surface text-fg shadow-sm" : "text-muted hover:text-fg",
                   )}
                 >
                   {option.label}
@@ -168,8 +170,24 @@ export function CatalogPage() {
 
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <div className="grid grid-cols-2 gap-2 sm:w-72">
-            <Input aria-label="Precio mínimo" placeholder="Precio mín." type="number" min={0} inputMode="decimal" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
-            <Input aria-label="Precio máximo" placeholder="Precio máx." type="number" min={0} inputMode="decimal" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+            <Input
+              aria-label="Precio mínimo"
+              placeholder="Precio mín."
+              type="number"
+              min={0}
+              inputMode="decimal"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+            />
+            <Input
+              aria-label="Precio máximo"
+              placeholder="Precio máx."
+              type="number"
+              min={0}
+              inputMode="decimal"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+            />
           </div>
           {canSeeAllStatuses && (
             <div className="sm:w-48">
@@ -218,7 +236,13 @@ export function CatalogPage() {
             icon={<PackageSearch className="size-6" />}
             title="No encontramos productos"
             description={hasFilters ? "Prueba con otros filtros o una búsqueda distinta." : "Todavía no hay productos publicados."}
-            action={hasFilters ? <Button variant="secondary" onClick={clearFilters}>Limpiar filtros</Button> : undefined}
+            action={
+              hasFilters ? (
+                <Button variant="secondary" onClick={clearFilters}>
+                  Limpiar filtros
+                </Button>
+              ) : undefined
+            }
           />
         ) : (
           <div className={cn("transition-opacity", isFetching && "opacity-60")}>

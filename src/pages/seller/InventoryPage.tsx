@@ -46,7 +46,7 @@ function StockView({ warehouses, products }: { warehouses: Warehouse[]; products
         if (key !== "pagina") next.delete("pagina");
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
 
   if (warehouses.length === 0) {
@@ -82,7 +82,10 @@ function StockView({ warehouses, products }: { warehouses: Warehouse[]; products
             label="Bodega"
             value={warehouseId ?? ""}
             onChange={(event) => setParam("bodega", event.target.value || undefined)}
-            options={[{ value: "", label: "Todas mis bodegas" }, ...warehouses.map((warehouse) => ({ value: warehouse.id, label: warehouse.location }))]}
+            options={[
+              { value: "", label: "Todas mis bodegas" },
+              ...warehouses.map((warehouse) => ({ value: warehouse.id, label: warehouse.location })),
+            ]}
           />
         </div>
         {!adding && (

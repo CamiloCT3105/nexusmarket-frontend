@@ -48,7 +48,11 @@ export const ROLES: Record<UserRole, { label: string; description: string; modul
       { title: "Vendedores", description: "Habilitar cuentas de vendedor y crear sus bodegas.", to: "/usuarios?rol=SELLER" },
       { title: "Pedidos y facturación", description: "Todos los pedidos; generar la factura de los pagados.", to: "/pedidos" },
       { title: "Envíos", description: "Crear envíos, despacharlos y confirmar entregas.", to: "/envios" },
-      { title: "Bodegas e inventario", description: "Bodegas del marketplace y de vendedores, ingresos y daños.", to: "/inventario?vista=bodegas" },
+      {
+        title: "Bodegas e inventario",
+        description: "Bodegas del marketplace y de vendedores, ingresos y daños.",
+        to: "/inventario?vista=bodegas",
+      },
       { title: "Devoluciones y reembolsos", description: "Decidir devoluciones y registrar reembolsos pagados.", to: "/devoluciones" },
       { title: "Reportes", description: "Ventas, inventario, logística y devoluciones.", to: "/reportes" },
     ],

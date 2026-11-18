@@ -18,7 +18,7 @@ export function OrderProgress({ status }: { status: OrderStatus }) {
               className={cn(
                 "h-1.5 rounded-full",
                 // Verde solo cuando el pedido terminó; mientras avanza, morado
-                done ? (finished ? "bg-accent" : "bg-brand") : active ? "bg-brand/40" : "bg-surface-2"
+                done ? (finished ? "bg-accent" : "bg-brand") : active ? "bg-brand/40" : "bg-surface-2",
               )}
             />
             <div className="flex items-center gap-1.5 text-xs sm:text-sm">

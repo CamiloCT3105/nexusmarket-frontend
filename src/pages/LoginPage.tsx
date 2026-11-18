@@ -25,7 +25,7 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       await login(email.trim(), password);
-      navigate(from, { replace: true });
+      void navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "No se pudo iniciar sesión.");
     } finally {

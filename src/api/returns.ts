@@ -7,8 +7,7 @@ export const returnsApi = {
   list: (query: { status?: ReturnStatus | undefined; page?: number; pageSize?: number }, signal?: AbortSignal) =>
     api<Page<ReturnRequest>>("/api/returns", { query, signal }),
   get: (id: string, signal?: AbortSignal) => api<ReturnRequest>(`/api/returns/${encodeURIComponent(id)}`, { signal }),
-  byOrder: (orderId: string, signal?: AbortSignal) =>
-    api<ReturnRequest[]>(`/api/returns/order/${encodeURIComponent(orderId)}`, { signal }),
+  byOrder: (orderId: string, signal?: AbortSignal) => api<ReturnRequest[]>(`/api/returns/order/${encodeURIComponent(orderId)}`, { signal }),
   create: (input: NewReturn) => api<ReturnRequest>("/api/returns", { method: "POST", body: input }),
 };
 

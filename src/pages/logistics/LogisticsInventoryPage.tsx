@@ -86,7 +86,7 @@ function StockView({ warehouses }: { warehouses: Warehouse[] }) {
         if (key !== "pagina") next.delete("pagina");
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
 
   return (
@@ -99,7 +99,10 @@ function StockView({ warehouses }: { warehouses: Warehouse[] }) {
             onChange={(event) => setParam("bodega", event.target.value || undefined)}
             options={[
               { value: "", label: "Todas las bodegas" },
-              ...warehouses.map((warehouse) => ({ value: warehouse.id, label: `${warehouse.location} (${TYPE_INFO[warehouse.type].label})` })),
+              ...warehouses.map((warehouse) => ({
+                value: warehouse.id,
+                label: `${warehouse.location} (${TYPE_INFO[warehouse.type].label})`,
+              })),
             ]}
           />
         </div>
@@ -122,7 +125,11 @@ function StockView({ warehouses }: { warehouses: Warehouse[] }) {
       ) : isPending ? (
         <PageLoader />
       ) : data.items.length === 0 ? (
-        <EmptyState icon={<Boxes className="size-6" />} title="Sin existencias registradas" description="Registra un ingreso de mercancía en esta bodega." />
+        <EmptyState
+          icon={<Boxes className="size-6" />}
+          title="Sin existencias registradas"
+          description="Registra un ingreso de mercancía en esta bodega."
+        />
       ) : (
         <div className={cn("space-y-3 transition-opacity", isFetching && "opacity-60")}>
           <InventoryList
@@ -203,7 +210,13 @@ function NewWarehouseCard({ onClose }: { onClose: () => void }) {
           {type === "MARKETPLACE" ? "Recibe productos de cualquier vendedor." : "Solo guarda productos del vendedor dueño."}
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Input label="Ubicación" placeholder="Ciudad o dirección" value={location} onChange={(event) => setLocation(event.target.value)} error={error} />
+          <Input
+            label="Ubicación"
+            placeholder="Ciudad o dirección"
+            value={location}
+            onChange={(event) => setLocation(event.target.value)}
+            error={error}
+          />
           {type === "SELLER" &&
             (sellers.isPending ? (
               <PageLoader />
@@ -259,9 +272,15 @@ function Reassign({ warehouse, onClose }: { warehouse: Warehouse; onClose: () =>
   }
   return (
     <div className="space-y-2">
-      <Select label="Nuevo dueño" value={target} onChange={(event) => setSellerId(event.target.value)} options={options.map((user) => ({ value: user.id, label: user.fullName }))} />
+      <Select
+        label="Nuevo dueño"
+        value={target}
+        onChange={(event) => setSellerId(event.target.value)}
+        options={options.map((user) => ({ value: user.id, label: user.fullName }))}
+      />
       <Confirm confirmLabel="Sí, reasignar" loading={link.isPending} error={link.error} onConfirm={() => link.mutate()} onCancel={onClose}>
-        La bodega pasa al vendedor elegido y desde ahí solo recibirá productos suyos. Lo que ya tenga guardado no cambia de dueño: úsalo para bodegas vacías o mal asignadas.
+        La bodega pasa al vendedor elegido y desde ahí solo recibirá productos suyos. Lo que ya tenga guardado no cambia de dueño: úsalo
+        para bodegas vacías o mal asignadas.
       </Confirm>
     </div>
   );
@@ -276,7 +295,9 @@ function WarehousesView({ warehouses }: { warehouses: Warehouse[] }) {
   const [reassigning, setReassigning] = useState<string | null>(null);
   const shown = type === "ALL" ? warehouses : warehouses.filter((warehouse) => warehouse.type === type);
   // El operador logístico no puede consultar usuarios: el administrador y el supervisor ven el nombre del dueño
-  const owners = useUsersById(isAdmin || role === "SUPERVISOR" ? warehouses.flatMap((warehouse) => (warehouse.sellerId ? [warehouse.sellerId] : [])) : []);
+  const owners = useUsersById(
+    isAdmin || role === "SUPERVISOR" ? warehouses.flatMap((warehouse) => (warehouse.sellerId ? [warehouse.sellerId] : [])) : [],
+  );
 
   return (
     <div className="space-y-4">

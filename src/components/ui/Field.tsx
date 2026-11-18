@@ -51,9 +51,7 @@ export function Input({ label, hint, error, leading, className, id, ...rest }: I
   return (
     <FieldWrapper label={label ?? ""} hint={hint ?? ""} error={error} id={inputId}>
       <div className="relative">
-        {leading && (
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">{leading}</span>
-        )}
+        {leading && <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">{leading}</span>}
         <input
           id={inputId}
           aria-invalid={error ? true : undefined}

@@ -30,7 +30,11 @@ export function BarList({
         const share = total > 0 ? Math.round((bar.value / total) * 100) : 0;
         const width = max > 0 ? (bar.value / max) * 100 : 0;
         return (
-          <li key={bar.key} tabIndex={bar.href ? undefined : 0} className="group relative rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/60">
+          <li
+            key={bar.key}
+            tabIndex={bar.href ? undefined : 0}
+            className="group relative rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+          >
             <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
               {bar.href ? (
                 <Link to={bar.href} className="min-w-0 truncate hover:text-brand-fg">
@@ -67,7 +71,17 @@ export function BarList({
 }
 
 // Cifra destacada (no todo necesita un gráfico)
-export function StatTile({ label, value, hint, tone }: { label: string; value: string; hint?: string | undefined; tone?: "success" | "warning" | "danger" | undefined }) {
+export function StatTile({
+  label,
+  value,
+  hint,
+  tone,
+}: {
+  label: string;
+  value: string;
+  hint?: string | undefined;
+  tone?: "success" | "warning" | "danger" | undefined;
+}) {
   return (
     <Card className="p-4">
       <p className="text-xs text-muted">{label}</p>
@@ -76,7 +90,7 @@ export function StatTile({ label, value, hint, tone }: { label: string; value: s
           "mt-1 font-display text-2xl font-semibold tabular-nums",
           tone === "success" && "text-accent-fg",
           tone === "warning" && "text-warning",
-          tone === "danger" && "text-danger"
+          tone === "danger" && "text-danger",
         )}
       >
         {value}
@@ -86,7 +100,17 @@ export function StatTile({ label, value, hint, tone }: { label: string; value: s
   );
 }
 
-export function ChartCard({ title, description, children, className }: { title: string; description?: string; children: ReactNode; className?: string }) {
+export function ChartCard({
+  title,
+  description,
+  children,
+  className,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <Card className={cn("p-5", className)}>
       <h2 className="font-semibold">{title}</h2>

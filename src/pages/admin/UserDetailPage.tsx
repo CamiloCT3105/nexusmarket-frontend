@@ -19,7 +19,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { Confirm } from "@/features/admin/Confirm";
 import { useIsSupervisor } from "@/features/admin/hooks";
 import { ALL_ROLES, COMMERCIAL_STATUS, ROLE_IMPLICATION, USER_STATUS, initials } from "@/features/admin/labels";
-import { formatAddress } from "@/features/buyer/AddressForm";
+import { formatAddress } from "@/features/buyer/address";
 import { STATUS_LABEL, STATUS_TONE } from "@/features/catalog/productLabels";
 import { cn } from "@/lib/cn";
 import { errorMessage, notFoundAsNull } from "@/lib/errors";
@@ -129,7 +129,8 @@ function RoleSection({ user, isMe }: { user: User; isMe: boolean }) {
               onConfirm={() => change.mutate()}
               onCancel={() => setConfirming(false)}
             >
-              ¿Cambiar el rol de {user.fullName} de {roleLabel(user.role).toLowerCase()} a {roleLabel(role).toLowerCase()}? Aplica de inmediato.
+              ¿Cambiar el rol de {user.fullName} de {roleLabel(user.role).toLowerCase()} a {roleLabel(role).toLowerCase()}? Aplica de
+              inmediato.
             </Confirm>
           ) : (
             <Button size="sm" disabled={role === user.role} onClick={() => setConfirming(true)}>
@@ -192,20 +193,20 @@ function SellerWarehouses({ userId }: { userId: string }) {
         </ul>
       )}
       {!readOnly && (
-      <form onSubmit={submit} noValidate className="flex flex-col gap-2 sm:flex-row sm:items-start">
-        <div className="flex-1">
-          <Input
-            aria-label="Ubicación de la nueva bodega"
-            placeholder="Ciudad o dirección de la bodega"
-            value={location}
-            onChange={(event) => setLocation(event.target.value)}
-            error={error}
-          />
-        </div>
-        <Button type="submit" variant="secondary" loading={create.isPending} icon={<WarehouseIcon className="size-4" />}>
-          Crear bodega
-        </Button>
-      </form>
+        <form onSubmit={submit} noValidate className="flex flex-col gap-2 sm:flex-row sm:items-start">
+          <div className="flex-1">
+            <Input
+              aria-label="Ubicación de la nueva bodega"
+              placeholder="Ciudad o dirección de la bodega"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              error={error}
+            />
+          </div>
+          <Button type="submit" variant="secondary" loading={create.isPending} icon={<WarehouseIcon className="size-4" />}>
+            Crear bodega
+          </Button>
+        </form>
       )}
       {create.error && <Alert tone="error">{errorMessage(create.error, "No se pudo crear la bodega.")}</Alert>}
     </div>
@@ -231,14 +232,16 @@ function SellerProducts({ userId }: { userId: string }) {
             <li key={product.id}>
               <Link to={`/catalogo/${product.id}`} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-surface-2/60">
                 <span className="min-w-0 flex-1 truncate">{product.name}</span>
-                <span className="tabular-nums text-muted">{formatMoney(product.price)}</span>
+                <span className="text-muted tabular-nums">{formatMoney(product.price)}</span>
                 <Badge tone={STATUS_TONE[product.status]}>{STATUS_LABEL[product.status]}</Badge>
               </Link>
             </li>
           ))}
         </ul>
       )}
-      {products.data.length > shown.length && <p className="text-xs text-muted">y {products.data.length - shown.length} más en el catálogo.</p>}
+      {products.data.length > shown.length && (
+        <p className="text-xs text-muted">y {products.data.length - shown.length} más en el catálogo.</p>
+      )}
     </div>
   );
 }
@@ -319,7 +322,8 @@ function BuyerSection({ user }: { user: User }) {
             <p className="text-muted">{formatAddress(buyer.data.primaryAddress)}</p>
             {buyer.data.additionalAddresses.length > 0 && (
               <p className="mt-1 text-xs text-muted">
-                + {buyer.data.additionalAddresses.length} {buyer.data.additionalAddresses.length === 1 ? "dirección adicional" : "direcciones adicionales"}
+                + {buyer.data.additionalAddresses.length}{" "}
+                {buyer.data.additionalAddresses.length === 1 ? "dirección adicional" : "direcciones adicionales"}
               </p>
             )}
           </div>
@@ -386,7 +390,10 @@ export function UserDetailPage() {
       {back}
       {created && (
         <Alert tone="success">
-          Usuario creado.{data.role === "SELLER" ? " Siguiente paso: habilita su cuenta de vendedor y crea su primera bodega." : " Ya puede iniciar sesión con la contraseña inicial."}
+          Usuario creado.
+          {data.role === "SELLER"
+            ? " Siguiente paso: habilita su cuenta de vendedor y crea su primera bodega."
+            : " Ya puede iniciar sesión con la contraseña inicial."}
         </Alert>
       )}
 
@@ -394,7 +401,7 @@ export function UserDetailPage() {
         <span
           className={cn(
             "flex size-14 shrink-0 items-center justify-center rounded-full text-lg font-semibold",
-            data.status === "BLOCKED" ? "bg-danger-soft text-danger" : "bg-brand-soft text-brand-fg"
+            data.status === "BLOCKED" ? "bg-danger-soft text-danger" : "bg-brand-soft text-brand-fg",
           )}
         >
           {initials(data.fullName)}

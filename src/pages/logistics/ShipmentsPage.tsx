@@ -34,7 +34,7 @@ function usePage(params: URLSearchParams, setParams: ReturnType<typeof useSearch
         else updated.delete("pagina");
         return updated;
       },
-      { replace: true }
+      { replace: true },
     );
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -56,7 +56,7 @@ function PaidOrderCard({ order, names, locations }: { order: Order; names: Map<s
       queryClient.setQueryData(["shipment", "order", order.id], created);
       queryClient.setQueryData(["shipment", created.id], created);
       void queryClient.invalidateQueries({ queryKey: ["shipments"] });
-      navigate(`/envios/${created.id}`, { state: { created: true } });
+      void navigate(`/envios/${created.id}`, { state: { created: true } });
     },
   });
   const units = order.items.reduce((sum, item) => sum + item.quantity, 0);

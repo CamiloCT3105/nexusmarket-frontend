@@ -22,7 +22,7 @@ export const inventoryApi = {
   // El backend limita al vendedor a sus bodegas
   list: (
     query: { productId?: string | undefined; warehouseId?: string | undefined; page?: number; pageSize?: number },
-    signal?: AbortSignal
+    signal?: AbortSignal,
   ) => api<Page<InventoryItem>>("/api/inventory", { query, signal }),
   inbound: (movement: StockMovement) => api<InventoryItem>("/api/inventory/inbound", { method: "POST", body: movement }),
   damaged: (movement: StockMovement) => api<InventoryItem>("/api/inventory/damaged", { method: "POST", body: movement }),

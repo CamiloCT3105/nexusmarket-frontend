@@ -15,8 +15,7 @@ export type CatalogQuery = {
 
 export const productsApi = {
   // GET /api/products: el backend decide qué ve cada rol (comprador: solo publicados)
-  search: (query: CatalogQuery, signal?: AbortSignal) =>
-    api<Page<Product>>("/api/products", { query, signal }),
+  search: (query: CatalogQuery, signal?: AbortSignal) => api<Page<Product>>("/api/products", { query, signal }),
 
   get: (id: string, signal?: AbortSignal) => api<Product>(`/api/products/${encodeURIComponent(id)}`, { signal }),
 };
@@ -26,8 +25,7 @@ export type NewProduct = { name: string; description: string; price: number; typ
 // Gestión del vendedor (el backend verifica que el producto sea suyo)
 export const sellerProductsApi = {
   // Todos sus productos, en cualquier estado (sin paginar; para selectores)
-  all: (sellerId: string, signal?: AbortSignal) =>
-    api<Product[]>(`/api/products/seller/${encodeURIComponent(sellerId)}`, { signal }),
+  all: (sellerId: string, signal?: AbortSignal) => api<Product[]>(`/api/products/seller/${encodeURIComponent(sellerId)}`, { signal }),
   create: (input: NewProduct) => api<Product>("/api/products", { method: "POST", body: input }),
   addVariant: (id: string, variant: { name: string; value: string }) =>
     api<Product>(`/api/products/${encodeURIComponent(id)}/variants`, { method: "PATCH", body: variant }),

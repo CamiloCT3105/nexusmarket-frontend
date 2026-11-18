@@ -47,7 +47,7 @@ function useSetParams() {
         }
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
 }
 
@@ -67,18 +67,39 @@ function Summary() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile label="Total facturado" value={formatMoney(data.totalInvoicedAmount)} hint="Facturas emitidas" />
         <StatTile label="Pedidos" value={String(orders)} hint={`${data.ordersByStatus.DELIVERED} entregados`} />
-        <StatTile label="Devoluciones por revisar" value={String(data.pendingReturns)} tone={data.pendingReturns > 0 ? "warning" : undefined} />
-        <StatTile label="Productos publicados" value={String(data.productsByStatus.PUBLISHED)} hint={`de ${sum(data.productsByStatus)} en total`} />
+        <StatTile
+          label="Devoluciones por revisar"
+          value={String(data.pendingReturns)}
+          tone={data.pendingReturns > 0 ? "warning" : undefined}
+        />
+        <StatTile
+          label="Productos publicados"
+          value={String(data.productsByStatus.PUBLISHED)}
+          hint={`de ${sum(data.productsByStatus)} en total`}
+        />
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard title="Pedidos por estado">
-          <BarList ariaLabel="Pedidos por estado" bars={ORDER_STEPS.map((status: OrderStatus) => ({ key: status, label: ORDER_STATUS[status].label, value: data.ordersByStatus[status] }))} />
+          <BarList
+            ariaLabel="Pedidos por estado"
+            bars={ORDER_STEPS.map((status: OrderStatus) => ({
+              key: status,
+              label: ORDER_STATUS[status].label,
+              value: data.ordersByStatus[status],
+            }))}
+          />
         </ChartCard>
         <ChartCard title="Usuarios por rol">
-          <BarList ariaLabel="Usuarios por rol" bars={ALL_ROLES.map((role: UserRole) => ({ key: role, label: roleLabel(role), value: data.usersByRole[role] }))} />
+          <BarList
+            ariaLabel="Usuarios por rol"
+            bars={ALL_ROLES.map((role: UserRole) => ({ key: role, label: roleLabel(role), value: data.usersByRole[role] }))}
+          />
         </ChartCard>
         <ChartCard title="Productos por estado">
-          <BarList ariaLabel="Productos por estado" bars={PRODUCT_STATUSES.map((status) => ({ key: status, label: STATUS_LABEL[status], value: data.productsByStatus[status] }))} />
+          <BarList
+            ariaLabel="Productos por estado"
+            bars={PRODUCT_STATUSES.map((status) => ({ key: status, label: STATUS_LABEL[status], value: data.productsByStatus[status] }))}
+          />
         </ChartCard>
       </div>
     </div>
@@ -160,14 +181,31 @@ function Sales() {
       {/* Filtros en una sola fila, arriba de los gráficos */}
       <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-end">
         <div className="grid grid-cols-2 gap-3 sm:w-80">
-          <Input label="Desde" type="date" value={from} max={to || undefined} onChange={(event) => setParams({ desde: event.target.value || undefined })} />
-          <Input label="Hasta" type="date" value={to} min={from || undefined} onChange={(event) => setParams({ hasta: event.target.value || undefined })} />
+          <Input
+            label="Desde"
+            type="date"
+            value={from}
+            max={to || undefined}
+            onChange={(event) => setParams({ desde: event.target.value || undefined })}
+          />
+          <Input
+            label="Hasta"
+            type="date"
+            value={to}
+            min={from || undefined}
+            onChange={(event) => setParams({ hasta: event.target.value || undefined })}
+          />
         </div>
         <div className="flex flex-wrap gap-2">
           {presets.map((preset) => {
             const active = preset.from === from && preset.to === to;
             return (
-              <Button key={preset.label} size="sm" variant={active ? "secondary" : "ghost"} onClick={() => setParams({ desde: preset.from || undefined, hasta: preset.to || undefined })}>
+              <Button
+                key={preset.label}
+                size="sm"
+                variant={active ? "secondary" : "ghost"}
+                onClick={() => setParams({ desde: preset.from || undefined, hasta: preset.to || undefined })}
+              >
                 {preset.label}
               </Button>
             );
@@ -196,7 +234,10 @@ function InventoryTable({ data, onlyLow }: { data: InventoryReport; onlyLow: boo
   const locations = new Map((warehouses.data ?? []).map((warehouse) => [warehouse.id, warehouse.location]));
   // Primero lo más urgente: menos unidades disponibles
   const rows = [...data.items].filter((row) => !onlyLow || row.lowStock).sort((a, b) => a.availableQuantity - b.availableQuantity);
-  if (rows.length === 0) return <p className="p-5 text-sm text-muted">{onlyLow ? "Ningún producto está por debajo del umbral." : "Sin existencias registradas."}</p>;
+  if (rows.length === 0)
+    return (
+      <p className="p-5 text-sm text-muted">{onlyLow ? "Ningún producto está por debajo del umbral." : "Sin existencias registradas."}</p>
+    );
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[36rem] text-sm">
@@ -220,7 +261,12 @@ function InventoryTable({ data, onlyLow }: { data: InventoryReport; onlyLow: boo
               </td>
               <td className="px-4 py-2.5 text-muted">{locations.get(row.warehouseId) ?? `Bodega ${shortId(row.warehouseId)}`}</td>
               <td className="px-4 py-2.5 text-right tabular-nums">
-                <span className={cn("inline-flex items-center gap-1 font-medium", row.availableQuantity === 0 ? "text-danger" : row.lowStock && "text-warning")}>
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 font-medium",
+                    row.availableQuantity === 0 ? "text-danger" : row.lowStock && "text-warning",
+                  )}
+                >
                   {row.lowStock && <AlertTriangle className="size-3.5" aria-label="Bajo el umbral" />}
                   {row.availableQuantity}
                 </span>
@@ -247,6 +293,7 @@ function Inventory() {
   useEffect(() => {
     const value = Number(debounced);
     if (debounced !== "" && Number.isInteger(value) && value >= 0 && value !== threshold) setParams({ umbral: String(value) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reacciona solo al texto ya asentado; con más dependencias, limpiar los filtros devolvería el texto viejo
   }, [debounced]);
 
   const { data, error, isPending, isFetching } = useQuery({
@@ -290,7 +337,12 @@ function Inventory() {
             <StatTile label="Unidades en bodegas" value={String(data.totalUnits)} />
             <StatTile label="Disponibles para vender" value={String(data.totalAvailable)} />
             <StatTile label="Dañadas" value={String(data.totalDamaged)} tone={data.totalDamaged > 0 ? "danger" : undefined} />
-            <StatTile label="Bajo el umbral" value={String(data.lowStockCount)} hint={`${data.threshold} unidades o menos`} tone={data.lowStockCount > 0 ? "warning" : undefined} />
+            <StatTile
+              label="Bajo el umbral"
+              value={String(data.lowStockCount)}
+              hint={`${data.threshold} unidades o menos`}
+              tone={data.lowStockCount > 0 ? "warning" : undefined}
+            />
           </div>
           <Card>
             <InventoryTable data={data} onlyLow={onlyLow} />
@@ -305,7 +357,10 @@ function Inventory() {
 
 function Logistics() {
   const readOnly = useIsSupervisor();
-  const { data, error, isPending } = useQuery({ queryKey: ["reports", "logistics"], queryFn: ({ signal }) => reportsApi.logistics(signal) });
+  const { data, error, isPending } = useQuery({
+    queryKey: ["reports", "logistics"],
+    queryFn: ({ signal }) => reportsApi.logistics(signal),
+  });
   if (error) return <Failed error={error} />;
   if (isPending) return <PageLoader />;
   const waiting = data.ordersAwaitingShipment;
@@ -315,7 +370,11 @@ function Logistics() {
         <BarList
           ariaLabel="Envíos por estado"
           emptyText="Aún no hay envíos."
-          bars={SHIPMENT_STEPS.map((status: ShipmentStatus) => ({ key: status, label: SHIPMENT_STATUS[status].label, value: data.shipmentsByStatus[status] }))}
+          bars={SHIPMENT_STEPS.map((status: ShipmentStatus) => ({
+            key: status,
+            label: SHIPMENT_STATUS[status].label,
+            value: data.shipmentsByStatus[status],
+          }))}
         />
       </ChartCard>
       <ChartCard title={`Pedidos pagados sin envío (${waiting.length})`} description="Esperan que el operador logístico cree su envío.">
@@ -387,8 +446,23 @@ export function ReportsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Reportes" description="Indicadores de ventas, inventario, logística y devoluciones, calculados al momento." />
-      <Segmented<View> label="Reporte" value={view} onChange={(next) => setParams(next === "resumen" ? {} : { vista: next }, { replace: true })} options={VIEWS} />
-      {view === "ventas" ? <Sales /> : view === "inventario" ? <Inventory /> : view === "logistica" ? <Logistics /> : view === "devoluciones" ? <Returns /> : <Summary />}
+      <Segmented<View>
+        label="Reporte"
+        value={view}
+        onChange={(next) => setParams(next === "resumen" ? {} : { vista: next }, { replace: true })}
+        options={VIEWS}
+      />
+      {view === "ventas" ? (
+        <Sales />
+      ) : view === "inventario" ? (
+        <Inventory />
+      ) : view === "logistica" ? (
+        <Logistics />
+      ) : view === "devoluciones" ? (
+        <Returns />
+      ) : (
+        <Summary />
+      )}
     </div>
   );
 }

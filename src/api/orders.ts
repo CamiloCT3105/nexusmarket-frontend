@@ -18,11 +18,9 @@ export const ordersApi = {
 };
 
 export const invoicesApi = {
-  list: (query: { page?: number; pageSize?: number }, signal?: AbortSignal) =>
-    api<Page<Invoice>>("/api/invoices", { query, signal }),
+  list: (query: { page?: number; pageSize?: number }, signal?: AbortSignal) => api<Page<Invoice>>("/api/invoices", { query, signal }),
   get: (id: string, signal?: AbortSignal) => api<Invoice>(`/api/invoices/${encodeURIComponent(id)}`, { signal }),
-  byOrder: (orderId: string, signal?: AbortSignal) =>
-    api<Invoice>(`/api/invoices/order/${encodeURIComponent(orderId)}`, { signal }),
+  byOrder: (orderId: string, signal?: AbortSignal) => api<Invoice>(`/api/invoices/order/${encodeURIComponent(orderId)}`, { signal }),
 };
 
 export const shipmentsApi = {
@@ -34,6 +32,5 @@ export const shipmentsApi = {
   // PREPARING → IN_TRANSIT (el pedido pasa a Enviado y sale el inventario) → DELIVERED
   updateStatus: (id: string, status: ShipmentStatus, note: string) =>
     api<Shipment>(`/api/shipments/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status, note } }),
-  byOrder: (orderId: string, signal?: AbortSignal) =>
-    api<Shipment>(`/api/shipments/order/${encodeURIComponent(orderId)}`, { signal }),
+  byOrder: (orderId: string, signal?: AbortSignal) => api<Shipment>(`/api/shipments/order/${encodeURIComponent(orderId)}`, { signal }),
 };

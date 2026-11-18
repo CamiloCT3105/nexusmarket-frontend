@@ -90,7 +90,8 @@ export function SellerOrderDetailPage() {
                   {product?.name ?? `Producto ${shortId(item.productId)}`}
                 </Link>
                 <p className="text-sm text-muted">
-                  {item.quantity} × {formatMoney(item.unitPrice)} · {locations.get(item.warehouseId) ?? `Bodega ${shortId(item.warehouseId)}`}
+                  {item.quantity} × {formatMoney(item.unitPrice)} ·{" "}
+                  {locations.get(item.warehouseId) ?? `Bodega ${shortId(item.warehouseId)}`}
                 </p>
               </div>
               <p className="font-semibold tabular-nums">{formatMoney(item.quantity * item.unitPrice)}</p>
@@ -102,7 +103,6 @@ export function SellerOrderDetailPage() {
           <span className="font-display text-2xl font-semibold tabular-nums">{formatMoney(data.sellerSubtotal ?? 0)}</span>
         </div>
       </Card>
-
     </div>
   );
 }

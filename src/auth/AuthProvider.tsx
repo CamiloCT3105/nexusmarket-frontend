@@ -8,7 +8,7 @@ import { AuthContext, type AuthContextValue, type AuthState } from "./AuthContex
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [state, setState] = useState<AuthState>(() =>
-    tokenStore.get() ? { status: "loading", user: null } : { status: "anonymous", user: null }
+    tokenStore.get() ? { status: "loading", user: null } : { status: "anonymous", user: null },
   );
 
   const logout = useCallback(() => {
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await authApi.register(input);
       return login(input.email, input.password); // tras registrarse, entra directamente
     },
-    [login]
+    [login],
   );
 
   const value = useMemo<AuthContextValue>(() => ({ ...state, login, register, logout }), [state, login, register, logout]);

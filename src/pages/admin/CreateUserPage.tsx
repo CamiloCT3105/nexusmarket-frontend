@@ -33,7 +33,7 @@ export function CreateUserPage() {
     onSuccess: (user) => {
       void queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.setQueryData(["user", user.id], user);
-      navigate(`/usuarios/${user.id}`, { state: { created: true } });
+      void navigate(`/usuarios/${user.id}`, { state: { created: true } });
     },
   });
 
@@ -62,9 +62,24 @@ export function CreateUserPage() {
       <form onSubmit={submit} noValidate className="space-y-6">
         <Card className="space-y-4 p-5">
           <h2 className="font-semibold">Datos de la persona</h2>
-          <Input label="Nombre completo" value={form.fullName} onChange={set("fullName")} error={errors.fullName} leading={<User className="size-4" />} autoComplete="off" />
+          <Input
+            label="Nombre completo"
+            value={form.fullName}
+            onChange={set("fullName")}
+            error={errors.fullName}
+            leading={<User className="size-4" />}
+            autoComplete="off"
+          />
           <div className="grid gap-4 sm:grid-cols-2">
-            <Input label="Correo electrónico" type="email" value={form.email} onChange={set("email")} error={errors.email} leading={<Mail className="size-4" />} autoComplete="off" />
+            <Input
+              label="Correo electrónico"
+              type="email"
+              value={form.email}
+              onChange={set("email")}
+              error={errors.email}
+              leading={<Mail className="size-4" />}
+              autoComplete="off"
+            />
             <Input
               label="Documento de identidad"
               value={form.documentNumber}
@@ -86,7 +101,15 @@ export function CreateUserPage() {
               leading={<Lock className="size-4" />}
               autoComplete="new-password"
             />
-            <Input label="Confirmar contraseña" type="password" value={form.confirm} onChange={set("confirm")} error={errors.confirm} leading={<Lock className="size-4" />} autoComplete="new-password" />
+            <Input
+              label="Confirmar contraseña"
+              type="password"
+              value={form.confirm}
+              onChange={set("confirm")}
+              error={errors.confirm}
+              leading={<Lock className="size-4" />}
+              autoComplete="new-password"
+            />
           </div>
         </Card>
 
@@ -99,10 +122,17 @@ export function CreateUserPage() {
                   key={value}
                   className={cn(
                     "flex cursor-pointer gap-3 rounded-xl border p-3 transition-colors",
-                    role === value ? "border-brand bg-brand-soft/50" : "border-border hover:bg-surface-2/60"
+                    role === value ? "border-brand bg-brand-soft/50" : "border-border hover:bg-surface-2/60",
                   )}
                 >
-                  <input type="radio" name="role" value={value} checked={role === value} onChange={() => setRole(value)} className="mt-1 accent-[var(--color-brand)]" />
+                  <input
+                    type="radio"
+                    name="role"
+                    value={value}
+                    checked={role === value}
+                    onChange={() => setRole(value)}
+                    className="mt-1 accent-[var(--color-brand)]"
+                  />
                   <span>
                     <span className="block text-sm font-medium">{roleLabel(value)}</span>
                     <span className="block text-xs text-muted">{ROLE_IMPLICATION[value]}</span>

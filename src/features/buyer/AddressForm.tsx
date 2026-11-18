@@ -81,8 +81,20 @@ export function AddressForm({
         error={errors.street}
       />
       <div className="grid gap-4 sm:grid-cols-3">
-        <Input label={LABELS.city} autoComplete="address-level2" value={address.city} onChange={(e) => set("city")(e.target.value)} error={errors.city} />
-        <Input label={LABELS.country} autoComplete="country-name" value={address.country} onChange={(e) => set("country")(e.target.value)} error={errors.country} />
+        <Input
+          label={LABELS.city}
+          autoComplete="address-level2"
+          value={address.city}
+          onChange={(e) => set("city")(e.target.value)}
+          error={errors.city}
+        />
+        <Input
+          label={LABELS.country}
+          autoComplete="country-name"
+          value={address.country}
+          onChange={(e) => set("country")(e.target.value)}
+          error={errors.country}
+        />
         <Input
           label={LABELS.postalCode}
           autoComplete="postal-code"
@@ -104,8 +116,4 @@ export function AddressForm({
       </div>
     </form>
   );
-}
-
-export function formatAddress(address: Address): string {
-  return `${address.street}, ${address.city} (${address.postalCode}), ${address.country}`;
 }

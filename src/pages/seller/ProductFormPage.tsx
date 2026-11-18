@@ -42,7 +42,7 @@ export function ProductFormPage() {
     onSuccess: (product) => {
       void queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.setQueryData(["product", product.id], product);
-      navigate(`/productos/${product.id}`, { state: { created: true } });
+      void navigate(`/productos/${product.id}`, { state: { created: true } });
     },
   });
 
@@ -76,7 +76,14 @@ export function ProductFormPage() {
       <PageHeader title="Nuevo producto" description="Se publica de inmediato. Después podrás agregar variantes y registrar inventario." />
       <Card className="p-5 sm:p-6">
         <form onSubmit={submit} noValidate className="space-y-4">
-          <Input label="Nombre" value={name} onChange={(event) => setName(event.target.value)} error={errors.name} maxLength={120} autoFocus />
+          <Input
+            label="Nombre"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            error={errors.name}
+            maxLength={120}
+            autoFocus
+          />
           <Textarea
             label="Descripción"
             hint="Opcional. Cuéntale al comprador qué incluye y sus características."

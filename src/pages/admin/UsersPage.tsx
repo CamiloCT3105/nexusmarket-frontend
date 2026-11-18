@@ -30,7 +30,8 @@ export function UsersPage() {
   const readOnly = useIsSupervisor();
   const [params, setParams] = useSearchParams();
   const role = ALL_ROLES.find((value) => value === params.get("rol"));
-  const status: UserStatus | undefined = params.get("estado") === "bloqueados" ? "BLOCKED" : params.get("estado") === "activos" ? "ACTIVE" : undefined;
+  const status: UserStatus | undefined =
+    params.get("estado") === "bloqueados" ? "BLOCKED" : params.get("estado") === "activos" ? "ACTIVE" : undefined;
   const page = Math.max(1, Number(params.get("pagina")) || 1);
 
   const [search, setSearch] = useState(params.get("q") ?? "");
@@ -47,11 +48,12 @@ export function UsersPage() {
         if (!("pagina" in changes)) next.delete("pagina");
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
 
   useEffect(() => {
     if ((params.get("q") ?? "") !== debounced) update({ q: debounced });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reacciona solo al texto ya asentado; con más dependencias, limpiar los filtros devolvería el texto viejo
   }, [debounced]);
 
   const query = { role, status, search: params.get("q") ?? undefined, page, pageSize: PAGE_SIZE };
@@ -65,7 +67,11 @@ export function UsersPage() {
     <div className="space-y-6">
       <PageHeader
         title="Usuarios"
-        description={readOnly ? "Cuentas de la plataforma, con su rol y estado." : "Cuentas de la plataforma: crea usuarios de cualquier rol, bloquéalos o cambia su rol."}
+        description={
+          readOnly
+            ? "Cuentas de la plataforma, con su rol y estado."
+            : "Cuentas de la plataforma: crea usuarios de cualquier rol, bloquéalos o cambia su rol."
+        }
         actions={
           readOnly ? undefined : (
             <Link to="/usuarios/nuevo">
@@ -108,16 +114,24 @@ export function UsersPage() {
       ) : isPending ? (
         <PageLoader />
       ) : data.items.length === 0 ? (
-        <EmptyState icon={<Users className="size-6" />} title="No hay usuarios con estos filtros" description="Prueba con otra búsqueda o quita los filtros." />
+        <EmptyState
+          icon={<Users className="size-6" />}
+          title="No hay usuarios con estos filtros"
+          description="Prueba con otra búsqueda o quita los filtros."
+        />
       ) : (
         <div className={cn("space-y-4 transition-opacity", isFetching && "opacity-60")}>
           <Card className="divide-y divide-border">
             {data.items.map((user) => (
-              <Link key={user.id} to={`/usuarios/${user.id}`} className="group flex items-center gap-3 p-4 transition-colors hover:bg-surface-2/50">
+              <Link
+                key={user.id}
+                to={`/usuarios/${user.id}`}
+                className="group flex items-center gap-3 p-4 transition-colors hover:bg-surface-2/50"
+              >
                 <span
                   className={cn(
                     "flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
-                    user.status === "BLOCKED" ? "bg-danger-soft text-danger" : "bg-brand-soft text-brand-fg"
+                    user.status === "BLOCKED" ? "bg-danger-soft text-danger" : "bg-brand-soft text-brand-fg",
                   )}
                 >
                   {initials(user.fullName)}

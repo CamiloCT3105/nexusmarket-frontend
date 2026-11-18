@@ -48,7 +48,8 @@ function CompleteRefund({ refund }: { refund: Refund }) {
           onConfirm={() => complete.mutate()}
           onCancel={() => setConfirming(false)}
         >
-          ¿Confirmas que ya se devolvieron {formatMoney(refund.amount)} al comprador? <span className="text-muted">No se puede deshacer.</span>
+          ¿Confirmas que ya se devolvieron {formatMoney(refund.amount)} al comprador?{" "}
+          <span className="text-muted">No se puede deshacer.</span>
         </Confirm>
       </div>
     );
@@ -82,7 +83,8 @@ function Refunds() {
       queryFn: ({ signal }: { signal: AbortSignal }) => returnsApi.get(refund.returnId, signal),
       staleTime: 5 * 60_000,
     })),
-    combine: (results) => new Map(results.flatMap((result) => (result.data ? [[result.data.id, result.data] as [string, ReturnRequest]] : []))),
+    combine: (results) =>
+      new Map(results.flatMap((result) => (result.data ? [[result.data.id, result.data] as [string, ReturnRequest]] : []))),
   });
   const { products } = useProductsById([...requests.values()].map((request) => request.productId));
 
@@ -97,7 +99,7 @@ function Refunds() {
         if (!("pagina" in changes)) next.delete("pagina");
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
 
   return (

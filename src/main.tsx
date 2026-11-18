@@ -15,8 +15,7 @@ const queryClient = new QueryClient({
       staleTime: 30_000,
       refetchOnWindowFocus: false,
       // Un 4xx no se arregla reintentando (permiso, no encontrado, datos inválidos)
-      retry: (failureCount, error) =>
-        !(error instanceof ApiError && error.status >= 400 && error.status < 500) && failureCount < 2,
+      retry: (failureCount, error) => !(error instanceof ApiError && error.status >= 400 && error.status < 500) && failureCount < 2,
     },
   },
 });
@@ -31,5 +30,5 @@ createRoot(root).render(
         <RouterProvider router={router} />
       </AuthProvider>
     </QueryClientProvider>
-  </StrictMode>
+  </StrictMode>,
 );
