@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
+import { ProductModeration } from "@/features/admin/ProductModeration";
 import { useCart, useCartActions } from "@/features/buyer/hooks";
 import { QuantityStepper } from "@/features/buyer/QuantityStepper";
 import { ProductArt } from "@/features/catalog/ProductArt";
@@ -148,6 +149,8 @@ export function ProductDetailPage() {
               </Button>
             </Link>
           )}
+
+          {user.role === "ADMIN" && <ProductModeration product={product} />}
 
           <p className="text-xs text-muted">Código del producto: {shortId(product.id)}</p>
         </div>

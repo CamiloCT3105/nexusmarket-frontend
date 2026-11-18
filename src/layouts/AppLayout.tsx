@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
-import { Boxes, FileText, Home, LogOut, Menu, Package, RotateCcw, ShoppingCart, Store, Tags, Truck, X, type LucideIcon } from "lucide-react";
+import { Boxes, FileText, Home, LogOut, Menu, Package, RotateCcw, ShoppingCart, Store, Tags, Truck, Users, X, type LucideIcon } from "lucide-react";
 import type { UserRole } from "@/api/types";
 import { useCart } from "@/features/buyer/hooks";
 import { useCurrentUser, useAuth } from "@/auth/AuthContext";
@@ -26,6 +26,14 @@ const ROLE_NAV: Partial<Record<UserRole, NavItem[]>> = {
   LOGISTICS_OPERATOR: [
     { to: "/envios", label: "Envíos", icon: Truck },
     { to: "/inventario", label: "Inventario", icon: Boxes },
+  ],
+  ADMIN: [
+    { to: "/usuarios", label: "Usuarios", icon: Users },
+    { to: "/pedidos", label: "Pedidos", icon: Package },
+    { to: "/envios", label: "Envíos", icon: Truck },
+    { to: "/inventario", label: "Inventario", icon: Boxes },
+    { to: "/facturas", label: "Facturas", icon: FileText },
+    { to: "/devoluciones", label: "Devoluciones", icon: RotateCcw },
   ],
   SELLER: [
     { to: "/productos", label: "Productos", icon: Tags },
@@ -85,6 +93,8 @@ export function AppLayout() {
   const isBuyer = user.role === "BUYER";
   const nav = [...COMMON_NAV, ...(ROLE_NAV[user.role] ?? [])];
   const closeMenu = () => setMenuOpen(false);
+  // Con muchas secciones (administrador), la barra completa solo cabe en pantallas extra anchas
+  const wide = nav.length > 6;
   const avatar = (
     <span className="flex size-9 items-center justify-center rounded-full bg-brand-soft text-sm font-semibold text-brand-fg">
       {initials(user.fullName)}
@@ -120,7 +130,7 @@ export function AppLayout() {
             <Logo />
           </NavLink>
 
-          <nav className="ml-4 hidden items-center gap-1 lg:flex">{links}</nav>
+          <nav className={cn("ml-4 hidden items-center gap-1", wide ? "xl:flex" : "lg:flex")}>{links}</nav>
 
           <div className="ml-auto flex items-center gap-2">
             {isBuyer && <CartButton onClick={closeMenu} />}
@@ -140,8 +150,9 @@ export function AppLayout() {
                 {avatar}
               </NavLink>
             ) : (
-              <div className="hidden items-center gap-3 border-l border-border pl-3 sm:flex">
-                <div className="text-right leading-tight">
+              <div className="hidden items-center gap-3 border-l border-border pl-3 sm:flex" title={wide ? user.fullName : undefined}>
+                {/* Con la barra ancha del administrador, el nombre se muestra solo si sobra espacio */}
+                <div className={cn("text-right leading-tight", wide && "xl:hidden 2xl:block")}>
                   <p className="max-w-40 truncate text-sm font-medium">{user.fullName}</p>
                   <Badge tone="brand" className="mt-0.5">
                     {roleLabel(user.role)}
@@ -164,7 +175,7 @@ export function AppLayout() {
               onClick={() => setMenuOpen((open) => !open)}
               aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={menuOpen}
-              className="inline-flex size-9 items-center justify-center rounded-xl text-muted hover:bg-surface-2 hover:text-fg lg:hidden"
+              className={cn("inline-flex size-9 items-center justify-center rounded-xl text-muted hover:bg-surface-2 hover:text-fg", wide ? "xl:hidden" : "lg:hidden")}
             >
               {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
@@ -172,7 +183,7 @@ export function AppLayout() {
         </div>
 
         {menuOpen && (
-          <div className="border-t border-border px-4 py-3 lg:hidden">
+          <div className={cn("border-t border-border px-4 py-3", wide ? "xl:hidden" : "lg:hidden")}>
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium">{user.fullName}</p>
