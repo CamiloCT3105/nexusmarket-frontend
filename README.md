@@ -170,6 +170,14 @@ E2E_API_URL=http://localhost:3000 E2E_ADMIN_EMAIL=<admin> E2E_ADMIN_PASSWORD=<cl
 
 El administrador es el que el backend crea al arrancar (`ADMIN_EMAIL` / `ADMIN_PASSWORD` de su `.env`). Si falta alguna variable, las pruebas se omiten con un aviso. Si algo falla, `npx playwright show-report` abre el reporte con capturas y la traza de cada paso.
 
+## Despliegue
+
+Se publica en **Vercel** con [`vercel.json`](./vercel.json): compila con Vite, redirige todas las rutas a `index.html` (para que `/pedidos/123` funcione al recargar), cachea los archivos compilados un año y agrega encabezados de seguridad. La única variable es `VITE_API_URL`, la URL pública del backend, que se fija al compilar.
+
+La guía completa de la plataforma (Neon, Atlas, Render y Vercel, con la carga de datos de demostración) está en [`DEPLOY.md` del backend](https://github.com/CamiloCT3105/nexusmarket-backend/blob/main/DEPLOY.md).
+
+El backend gratuito de Render se duerme tras 15 minutos sin uso: mientras despierta, el inicio de sesión y la carga inicial muestran un aviso en lugar de parecer congelados.
+
 ## Integración continua
 
 En cada PR y en cada cambio a `main`, GitHub Actions (`.github/workflows/ci.yml`) ejecuta:
