@@ -34,9 +34,9 @@ export const ROLES: Record<UserRole, { label: string; description: string; modul
     description: "Opera bodegas, despachos y entregas.",
     modules: [
       { title: "Catálogo", description: "Productos publicados.", to: "/catalogo" },
-      { title: "Envíos", description: "Crear envíos y actualizar su seguimiento." },
-      { title: "Inventario", description: "Ingresos y unidades dañadas en cualquier bodega." },
-      { title: "Bodegas", description: "Consulta de bodegas del marketplace y de vendedores." },
+      { title: "Envíos", description: "Crear envíos de pedidos pagados y actualizar su seguimiento.", to: "/envios" },
+      { title: "Inventario", description: "Ingresos y unidades dañadas en cualquier bodega.", to: "/inventario" },
+      { title: "Bodegas", description: "Consulta de bodegas del marketplace y de vendedores.", to: "/inventario?vista=bodegas" },
     ],
   },
   ADMIN: {

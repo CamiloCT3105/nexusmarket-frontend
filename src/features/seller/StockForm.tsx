@@ -28,6 +28,7 @@ export function StockForm({
   warehouseId: fixedWarehouse,
   onDone,
   onCancel,
+  productFitsWarehouse,
 }: {
   mode: StockMode;
   products?: Product[];
@@ -36,10 +37,16 @@ export function StockForm({
   warehouseId?: string;
   onDone?: () => void;
   onCancel?: () => void;
+  // Limita los productos que se ofrecen según la bodega elegida
+  productFitsWarehouse?: (product: Product, warehouse: Warehouse) => boolean;
 }) {
   const queryClient = useQueryClient();
-  const [productId, setProductId] = useState(fixedProduct ?? products?.[0]?.id ?? "");
+  const [chosenProduct, setProductId] = useState(fixedProduct ?? "");
   const [warehouseId, setWarehouseId] = useState(fixedWarehouse ?? warehouses?.[0]?.id ?? "");
+  const warehouse = warehouses?.find((item) => item.id === warehouseId);
+  const options = products?.filter((product) => !productFitsWarehouse || !warehouse || productFitsWarehouse(product, warehouse));
+  // Si el producto elegido no aplica a la bodega nueva, se toma el primero disponible
+  const productId = fixedProduct ?? (options?.some((product) => product.id === chosenProduct) ? chosenProduct : (options?.[0]?.id ?? ""));
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState<string | undefined>();
 
@@ -69,21 +76,25 @@ export function StockForm({
 
   return (
     <form onSubmit={submit} noValidate className="space-y-3">
-      {!fixedProduct && products && (
-        <Select
-          label="Producto"
-          value={productId}
-          onChange={(event) => setProductId(event.target.value)}
-          options={products.map((product) => ({ value: product.id, label: product.name }))}
-        />
-      )}
       {!fixedWarehouse && warehouses && (
         <Select
           label="Bodega"
           value={warehouseId}
           onChange={(event) => setWarehouseId(event.target.value)}
-          options={warehouses.map((warehouse) => ({ value: warehouse.id, label: warehouse.location }))}
+          options={warehouses.map((item) => ({ value: item.id, label: item.location }))}
         />
+      )}
+      {!fixedProduct && options && (
+        options.length > 0 ? (
+          <Select
+            label="Producto"
+            value={productId}
+            onChange={(event) => setProductId(event.target.value)}
+            options={options.map((product) => ({ value: product.id, label: product.name }))}
+          />
+        ) : (
+          <Alert tone="info">No hay productos publicados que puedan ingresar a esta bodega.</Alert>
+        )
       )}
       <Input
         label={COPY[mode].quantity}

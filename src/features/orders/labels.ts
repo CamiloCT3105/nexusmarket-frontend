@@ -28,3 +28,19 @@ export const REFUND_STATUS: Record<RefundStatus, { label: string; tone: Tone }> 
   PENDING: { label: "Pendiente", tone: "warning" },
   COMPLETED: { label: "Completado", tone: "success" },
 };
+
+export const SHIPMENT_STEPS: ShipmentStatus[] = ["PREPARING", "IN_TRANSIT", "DELIVERED"];
+
+// Siguiente paso del envío y cómo se nombra la acción del operador
+export const SHIPMENT_NEXT: Partial<Record<ShipmentStatus, { status: ShipmentStatus; action: string; help: string }>> = {
+  PREPARING: {
+    status: "IN_TRANSIT",
+    action: "Despachar",
+    help: "El pedido pasa a Enviado y las unidades reservadas salen del inventario de cada bodega.",
+  },
+  IN_TRANSIT: {
+    status: "DELIVERED",
+    action: "Confirmar entrega",
+    help: "El pedido queda Entregado y ya no se puede modificar. El comprador podrá solicitar devoluciones.",
+  },
+};

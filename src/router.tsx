@@ -16,6 +16,9 @@ import { OrderDetailPage } from "@/pages/buyer/OrderDetailPage";
 import { OrdersPage } from "@/pages/buyer/OrdersPage";
 import { ProfilePage } from "@/pages/buyer/ProfilePage";
 import { ReturnsPage } from "@/pages/buyer/ReturnsPage";
+import { LogisticsInventoryPage } from "@/pages/logistics/LogisticsInventoryPage";
+import { ShipmentDetailPage } from "@/pages/logistics/ShipmentDetailPage";
+import { ShipmentsPage } from "@/pages/logistics/ShipmentsPage";
 import { InventoryPage } from "@/pages/seller/InventoryPage";
 import { ProductFormPage } from "@/pages/seller/ProductFormPage";
 import { SellerOrderDetailPage } from "@/pages/seller/SellerOrderDetailPage";
@@ -26,6 +29,7 @@ import { SellerReturnsPage } from "@/pages/seller/SellerReturnsPage";
 
 const buyer = (element: ReactElement) => <RequireRole roles={["BUYER"]}>{element}</RequireRole>;
 const seller = (element: ReactElement) => <RequireRole roles={["SELLER"]}>{element}</RequireRole>;
+const logistics = (element: ReactElement) => <RequireRole roles={["LOGISTICS_OPERATOR"]}>{element}</RequireRole>;
 
 export const router = createBrowserRouter([
   // Acceso (solo sin sesión)
@@ -65,7 +69,11 @@ export const router = createBrowserRouter([
           { path: "/productos", element: seller(<SellerProductsPage />) },
           { path: "/productos/nuevo", element: seller(<ProductFormPage />) },
           { path: "/productos/:id", element: seller(<SellerProductDetailPage />) },
-          { path: "/inventario", element: seller(<InventoryPage />) },
+          // Inventario: el vendedor ve sus bodegas; el operador logístico, todas
+          { path: "/inventario", element: <ByRole views={{ SELLER: <InventoryPage />, LOGISTICS_OPERATOR: <LogisticsInventoryPage /> }} /> },
+          // Operador logístico
+          { path: "/envios", element: logistics(<ShipmentsPage />) },
+          { path: "/envios/:id", element: logistics(<ShipmentDetailPage />) },
           { path: "*", element: <NotFoundPage /> },
         ],
       },

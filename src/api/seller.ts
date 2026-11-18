@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { InventoryItem, Page, Seller, Warehouse } from "./types";
+import type { InventoryItem, Page, Seller, Warehouse, WarehouseType } from "./types";
 
 export type StockMovement = { productId: string; warehouseId: string; quantity: number };
 
@@ -9,6 +9,9 @@ export const sellersApi = {
 };
 
 export const warehousesApi = {
+  // Todas las bodegas (operador logístico, administrador y supervisor)
+  list: (query: { type?: WarehouseType | undefined; page?: number; pageSize?: number }, signal?: AbortSignal) =>
+    api<Page<Warehouse>>("/api/warehouses", { query, signal }),
   bySeller: (sellerId: string, signal?: AbortSignal) =>
     api<Warehouse[]>(`/api/warehouses/seller/${encodeURIComponent(sellerId)}`, { signal }),
   // Un vendedor solo puede crear bodegas propias (tipo SELLER)
