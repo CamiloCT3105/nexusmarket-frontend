@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
-import { FileText, Home, LogOut, Menu, Package, RotateCcw, ShoppingCart, Store, X, type LucideIcon } from "lucide-react";
+import { Boxes, FileText, Home, LogOut, Menu, Package, RotateCcw, ShoppingCart, Store, Tags, X, type LucideIcon } from "lucide-react";
 import type { UserRole } from "@/api/types";
 import { useCart } from "@/features/buyer/hooks";
 import { useCurrentUser, useAuth } from "@/auth/AuthContext";
@@ -21,6 +21,12 @@ const ROLE_NAV: Partial<Record<UserRole, NavItem[]>> = {
   BUYER: [
     { to: "/pedidos", label: "Pedidos", icon: Package },
     { to: "/facturas", label: "Facturas", icon: FileText },
+    { to: "/devoluciones", label: "Devoluciones", icon: RotateCcw },
+  ],
+  SELLER: [
+    { to: "/productos", label: "Productos", icon: Tags },
+    { to: "/inventario", label: "Inventario", icon: Boxes },
+    { to: "/pedidos", label: "Pedidos", icon: Package },
     { to: "/devoluciones", label: "Devoluciones", icon: RotateCcw },
   ],
 };

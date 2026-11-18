@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Settings2, ShoppingCart } from "lucide-react";
 import { productsApi } from "@/api/products";
 import { ApiError } from "@/api/client";
 import { useCurrentUser } from "@/auth/AuthContext";
@@ -141,6 +141,13 @@ export function ProductDetailPage() {
           )}
 
           {user.role === "BUYER" && product.status === "PUBLISHED" && <AddToCart productId={product.id} />}
+          {user.role === "SELLER" && product.sellerId === user.id && (
+            <Link to={`/productos/${product.id}`} className="self-start">
+              <Button variant="secondary" icon={<Settings2 className="size-4" />}>
+                Administrar producto
+              </Button>
+            </Link>
+          )}
 
           <p className="text-xs text-muted">Código del producto: {shortId(product.id)}</p>
         </div>
