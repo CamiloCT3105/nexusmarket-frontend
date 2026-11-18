@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/Field";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { useProductsById } from "@/features/buyer/hooks";
 import { ProductArt } from "@/features/catalog/ProductArt";
+import { useIsSupervisor } from "@/features/admin/hooks";
 import { useAllWarehouses } from "@/features/logistics/hooks";
 import { ORDER_STATUS, SHIPMENT_NEXT, SHIPMENT_STATUS, SHIPMENT_STEPS } from "@/features/orders/labels";
 import { ShipmentTimeline } from "@/features/orders/ShipmentTimeline";
@@ -112,6 +113,7 @@ function AdvanceCard({ shipment }: { shipment: Shipment }) {
 }
 
 export function ShipmentDetailPage() {
+  const readOnly = useIsSupervisor();
   const { id = "" } = useParams();
   const location = useLocation();
   const created = (location.state as { created?: boolean } | null)?.created === true;
@@ -205,7 +207,14 @@ export function ShipmentDetailPage() {
         </div>
 
         <div className="lg:sticky lg:top-24 lg:h-fit">
-          <AdvanceCard shipment={data} />
+          {readOnly ? (
+            <Card className="p-5 text-sm">
+              <p className="font-semibold">Estado: {SHIPMENT_STATUS[data.status].label}</p>
+              <p className="mt-1 text-muted">{SHIPMENT_NEXT[data.status]?.help ?? "Envío entregado y cerrado."}</p>
+            </Card>
+          ) : (
+            <AdvanceCard shipment={data} />
+          )}
         </div>
       </div>
     </div>

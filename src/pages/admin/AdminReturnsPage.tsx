@@ -15,6 +15,7 @@ import { PageLoader } from "@/components/ui/PageLoader";
 import { Pagination } from "@/components/ui/Pagination";
 import { Segmented } from "@/components/ui/Segmented";
 import { Confirm } from "@/features/admin/Confirm";
+import { useIsSupervisor } from "@/features/admin/hooks";
 import { useProductsById } from "@/features/buyer/hooks";
 import { REFUND_STATUS } from "@/features/orders/labels";
 import { ReturnRequests } from "@/pages/seller/SellerReturnsPage";
@@ -62,6 +63,7 @@ function CompleteRefund({ refund }: { refund: Refund }) {
 }
 
 function Refunds() {
+  const readOnly = useIsSupervisor();
   const [params, setParams] = useSearchParams();
   // Por defecto, los pendientes de pagar
   const raw = params.get("estado");
@@ -148,7 +150,7 @@ function Refunds() {
                     </>
                   )}
                 </p>
-                {refund.status === "PENDING" && <CompleteRefund refund={refund} />}
+                {refund.status === "PENDING" && !readOnly && <CompleteRefund refund={refund} />}
               </Card>
             );
           })}
@@ -171,6 +173,7 @@ function Refunds() {
 }
 
 export function AdminReturnsPage() {
+  const readOnly = useIsSupervisor();
   const [params, setParams] = useSearchParams();
   const view: View = params.get("vista") === "reembolsos" ? "reembolsos" : "solicitudes";
 
@@ -178,7 +181,11 @@ export function AdminReturnsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Devoluciones y reembolsos"
-        description="Decide las solicitudes de cualquier vendedor y registra cuándo se devolvió el dinero."
+        description={
+          readOnly
+            ? "Solicitudes de devolución de toda la plataforma y estado de cada reembolso."
+            : "Decide las solicitudes de cualquier vendedor y registra cuándo se devolvió el dinero."
+        }
         actions={
           <Segmented<View>
             label="Vista"
@@ -191,7 +198,7 @@ export function AdminReturnsPage() {
           />
         }
       />
-      {view === "reembolsos" ? <Refunds key="reembolsos" /> : <ReturnRequests key="solicitudes" admin />}
+      {view === "reembolsos" ? <Refunds key="reembolsos" /> : <ReturnRequests key="solicitudes" admin readOnly={readOnly} />}
     </div>
   );
 }

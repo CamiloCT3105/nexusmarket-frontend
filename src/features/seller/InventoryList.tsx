@@ -28,12 +28,15 @@ export function InventoryList({
   warehouses,
   hideProduct = false,
   productHref = (id: string) => `/productos/${id}`,
+  readOnly = false,
 }: {
   items: InventoryItem[];
   products: Map<string, Product>;
   warehouses: Map<string, Warehouse>;
   hideProduct?: boolean;
   productHref?: (productId: string) => string;
+  // Solo consulta (supervisor): sin ingreso ni unidades dañadas
+  readOnly?: boolean;
 }) {
   const [open, setOpen] = useState<{ key: string; mode: StockMode } | null>(null);
 
@@ -78,7 +81,7 @@ export function InventoryList({
               </div>
             </div>
 
-            {active ? (
+            {readOnly ? null : active ? (
               <div className="mt-4 border-t border-border pt-4">
                 <StockForm
                   mode={active}

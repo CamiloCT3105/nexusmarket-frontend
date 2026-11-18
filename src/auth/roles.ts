@@ -50,16 +50,20 @@ export const ROLES: Record<UserRole, { label: string; description: string; modul
       { title: "Envíos", description: "Crear envíos, despacharlos y confirmar entregas.", to: "/envios" },
       { title: "Bodegas e inventario", description: "Bodegas del marketplace y de vendedores, ingresos y daños.", to: "/inventario?vista=bodegas" },
       { title: "Devoluciones y reembolsos", description: "Decidir devoluciones y registrar reembolsos pagados.", to: "/devoluciones" },
-      { title: "Reportes", description: "Ventas, inventario, logística y devoluciones." },
+      { title: "Reportes", description: "Ventas, inventario, logística y devoluciones.", to: "/reportes" },
     ],
   },
   SUPERVISOR: {
     label: "Supervisor",
     description: "Consulta y seguimiento operativo.",
     modules: [
+      { title: "Reportes", description: "Ventas, inventario, logística y devoluciones.", to: "/reportes" },
+      { title: "Pedidos", description: "Todos los pedidos, con su factura, envío y devoluciones.", to: "/pedidos" },
+      { title: "Envíos", description: "Seguimiento de cada envío hasta la entrega.", to: "/envios" },
+      { title: "Inventario y bodegas", description: "Existencias en todas las bodegas y bajo stock.", to: "/inventario" },
+      { title: "Devoluciones y reembolsos", description: "Solicitudes y reembolsos de toda la plataforma.", to: "/devoluciones" },
+      { title: "Usuarios", description: "Cuentas de la plataforma, con su rol y estado.", to: "/usuarios" },
       { title: "Catálogo", description: "Todos los productos, con filtro por estado.", to: "/catalogo" },
-      { title: "Reportes", description: "Ventas, inventario, logística y devoluciones." },
-      { title: "Pedidos y envíos", description: "Seguimiento de toda la operación." },
     ],
   },
 };

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
-import { Boxes, FileText, Home, LogOut, Menu, Package, RotateCcw, ShoppingCart, Store, Tags, Truck, Users, X, type LucideIcon } from "lucide-react";
+import { BarChart3, Boxes, FileText, Home, LogOut, Menu, Package, RotateCcw, ShoppingCart, Store, Tags, Truck, Users, X, type LucideIcon } from "lucide-react";
 import type { UserRole } from "@/api/types";
 import { useCart } from "@/features/buyer/hooks";
 import { useCurrentUser, useAuth } from "@/auth/AuthContext";
@@ -28,12 +28,21 @@ const ROLE_NAV: Partial<Record<UserRole, NavItem[]>> = {
     { to: "/inventario", label: "Inventario", icon: Boxes },
   ],
   ADMIN: [
+    { to: "/reportes", label: "Reportes", icon: BarChart3 },
     { to: "/usuarios", label: "Usuarios", icon: Users },
     { to: "/pedidos", label: "Pedidos", icon: Package },
     { to: "/envios", label: "Envíos", icon: Truck },
     { to: "/inventario", label: "Inventario", icon: Boxes },
     { to: "/facturas", label: "Facturas", icon: FileText },
     { to: "/devoluciones", label: "Devoluciones", icon: RotateCcw },
+  ],
+  SUPERVISOR: [
+    { to: "/reportes", label: "Reportes", icon: BarChart3 },
+    { to: "/pedidos", label: "Pedidos", icon: Package },
+    { to: "/envios", label: "Envíos", icon: Truck },
+    { to: "/inventario", label: "Inventario", icon: Boxes },
+    { to: "/devoluciones", label: "Devoluciones", icon: RotateCcw },
+    { to: "/usuarios", label: "Usuarios", icon: Users },
   ],
   SELLER: [
     { to: "/productos", label: "Productos", icon: Tags },
@@ -91,7 +100,9 @@ export function AppLayout() {
   };
 
   const isBuyer = user.role === "BUYER";
-  const nav = [...COMMON_NAV, ...(ROLE_NAV[user.role] ?? [])];
+  const roleNav = ROLE_NAV[user.role] ?? [];
+  // Roles con muchas secciones: el logo ya lleva al inicio, así que se omite "Inicio" para que quepa la barra
+  const nav = [...(roleNav.length > 5 ? COMMON_NAV.filter((item) => item.to !== "/inicio") : COMMON_NAV), ...roleNav];
   const closeMenu = () => setMenuOpen(false);
   // Con muchas secciones (administrador), la barra completa solo cabe en pantallas extra anchas
   const wide = nav.length > 6;

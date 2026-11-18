@@ -25,7 +25,8 @@ Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vended
 | Administrador: usuarios (crear, bloquear, cambiar rol) y cuentas de vendedor | ✅ |
 | Administrador: pedidos, facturación, devoluciones y reembolsos | ✅ |
 | Administrador: bodegas (crear, reasignar), envíos y moderación de productos | ✅ |
-| Supervisor y reportes | Próxima fase |
+| Reportes: resumen, ventas por periodo, inventario con bajo stock, logística y devoluciones | ✅ |
+| Supervisor: consulta de pedidos, envíos, inventario, devoluciones, usuarios y facturas (sin acciones) | ✅ |
 
 ## Pantallas del comprador
 
@@ -78,6 +79,22 @@ Flujo: pedido pagado → **crear envío** (En preparación, con guía `NX-…`) 
 | `/catalogo/:id` | Moderación: publicar, suspender o descontinuar cualquier producto |
 
 Flujo para incorporar un vendedor: **crear usuario** con rol Vendedor → **habilitar como vendedor** → **crear su bodega** → el vendedor ya puede publicar e ingresar mercancía.
+
+## Reportes (administrador y supervisor)
+
+| Ruta | Reporte |
+|---|---|
+| `/reportes` | Resumen: total facturado, pedidos, devoluciones por revisar; pedidos, usuarios y productos por estado |
+| `/reportes?vista=ventas` | Ingresos, pedidos y ticket promedio en un rango de fechas (con atajos de 7 y 30 días); productos más vendidos e ingresos por vendedor |
+| `/reportes?vista=inventario` | Unidades, disponibles, dañadas y bajo stock con umbral ajustable; tabla ordenada por lo más urgente |
+| `/reportes?vista=logistica` | Envíos por estado y pedidos pagados que aún no tienen envío |
+| `/reportes?vista=devoluciones` | Solicitudes por estado, reembolsos por pagar y ya pagados |
+
+Los filtros (fechas, umbral, "solo bajo stock") viven en la URL, como en el resto de la app.
+
+## Pantallas del supervisor
+
+El supervisor ve las mismas pantallas que el administrador (`/pedidos`, `/envios`, `/inventario`, `/devoluciones`, `/usuarios`, `/facturas`) **en modo consulta**: sin crear, aprobar, despachar, facturar, bloquear ni moderar. El backend tampoco se lo permite; la interfaz simplemente no muestra esas acciones.
 
 ## Stack
 
@@ -145,10 +162,10 @@ src/
 ├── auth/           # Sesión, guardias de ruta y configuración de roles
 ├── components/
 │   └── ui/         # Botón, campos, tarjeta, etiqueta, alerta, paginación…
-├── features/       # Piezas de cada módulo: catálogo, comprador, pedidos, vendedor (inventario), logística, administrador
+├── features/       # Piezas de cada módulo: catálogo, comprador, pedidos, vendedor (inventario), logística, administrador, reportes
 ├── layouts/        # Estructura con sesión (barra superior) y sin sesión (acceso)
 ├── lib/            # Utilidades: formato de moneda y fechas, clases, debounce
-├── pages/          # Una pantalla por ruta (pages/buyer, pages/seller, pages/logistics, pages/admin)
+├── pages/          # Una pantalla por ruta (pages/buyer, pages/seller, pages/logistics, pages/admin, pages/reports)
 ├── theme/          # Tema claro/oscuro
 ├── index.css       # Paleta y estilos base
 ├── main.tsx        # Punto de entrada
@@ -180,6 +197,10 @@ src/
 - **Bloquear, cambiar rol, completar un reembolso, reasignar una bodega o moderar un producto piden confirmación.** El cambio de rol aplica de inmediato porque el backend lee el rol actual en cada petición.
 - **El estado comercial "restringido" es solo una marca:** el backend no limita las compras de un comprador restringido, y la interfaz lo dice al confirmar.
 - **Reasignar una bodega no cambia el dueño de lo que ya tiene guardado:** la interfaz lo advierte y lo recomienda para bodegas vacías o mal asignadas.
-- **Con muchas secciones (administrador), la barra completa aparece desde 1280 px;** en pantallas menores se usa el menú.
+- **Con muchas secciones (administrador y supervisor), la barra completa aparece desde 1280 px** y sin el enlace "Inicio" (el logo lleva ahí); en pantallas menores se usa el menú.
+- **Gráficos sin librería:** barras horizontales de una sola serie en morado (el color marca magnitud, no categorías), con la etiqueta y el valor siempre en texto y el detalle (participación sobre el total) al pasar el cursor o enfocar la fila. Lo que es una sola cifra se muestra como tarjeta, no como gráfico.
+- **"Productos más vendidos" se ordena por unidades,** igual que el backend; los ingresos de cada producto aparecen en el detalle.
+- **Las fechas del reporte de ventas se interpretan en UTC en el backend:** un pedido hecho de noche en Colombia (después de las 7 p. m.) cuenta para el día siguiente.
+- **Supervisor en modo consulta con un solo hook (`useIsSupervisor`):** cada acción se oculta donde se dibuja, así las pantallas del administrador sirven para los dos roles sin duplicarlas.
 - **Al imprimir una factura** se ocultan la barra y los botones y se usa siempre la paleta clara.
 - **Sin imágenes de producto** (el backend aún no las guarda): cada producto muestra una ilustración según su tipo.

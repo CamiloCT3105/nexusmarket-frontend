@@ -16,6 +16,7 @@ import { Input, Select } from "@/components/ui/Field";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Pagination } from "@/components/ui/Pagination";
 import { Segmented } from "@/components/ui/Segmented";
+import { useIsSupervisor } from "@/features/admin/hooks";
 import { ALL_ROLES, USER_STATUS, initials } from "@/features/admin/labels";
 import { cn } from "@/lib/cn";
 import { errorMessage } from "@/lib/errors";
@@ -26,6 +27,7 @@ type StatusFilter = UserStatus | "ALL";
 
 export function UsersPage() {
   const me = useCurrentUser();
+  const readOnly = useIsSupervisor();
   const [params, setParams] = useSearchParams();
   const role = ALL_ROLES.find((value) => value === params.get("rol"));
   const status: UserStatus | undefined = params.get("estado") === "bloqueados" ? "BLOCKED" : params.get("estado") === "activos" ? "ACTIVE" : undefined;
@@ -63,11 +65,13 @@ export function UsersPage() {
     <div className="space-y-6">
       <PageHeader
         title="Usuarios"
-        description="Cuentas de la plataforma: crea usuarios de cualquier rol, bloquéalos o cambia su rol."
+        description={readOnly ? "Cuentas de la plataforma, con su rol y estado." : "Cuentas de la plataforma: crea usuarios de cualquier rol, bloquéalos o cambia su rol."}
         actions={
-          <Link to="/usuarios/nuevo">
-            <Button icon={<UserPlus className="size-4" />}>Nuevo usuario</Button>
-          </Link>
+          readOnly ? undefined : (
+            <Link to="/usuarios/nuevo">
+              <Button icon={<UserPlus className="size-4" />}>Nuevo usuario</Button>
+            </Link>
+          )
         }
       />
 

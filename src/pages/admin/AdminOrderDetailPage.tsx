@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Spinner } from "@/components/ui/Spinner";
-import { useUsersById } from "@/features/admin/hooks";
+import { useIsSupervisor, useUsersById } from "@/features/admin/hooks";
 import { useProductsById } from "@/features/buyer/hooks";
 import { ProductArt } from "@/features/catalog/ProductArt";
 import { useAllWarehouses } from "@/features/logistics/hooks";
@@ -35,6 +35,7 @@ function SideCard({ icon, title, children }: { icon: ReactNode; title: string; c
 
 // La factura no se genera sola al pagar: la emite el administrador
 function InvoiceCard({ order }: { order: Order }) {
+  const readOnly = useIsSupervisor();
   const queryClient = useQueryClient();
   const invoice = useQuery({
     queryKey: ["invoice", "order", order.id],
@@ -65,6 +66,8 @@ function InvoiceCard({ order }: { order: Order }) {
         </div>
       ) : order.status === "PENDING_PAYMENT" ? (
         <p className="text-muted">Se podrá facturar cuando el comprador pague.</p>
+      ) : readOnly ? (
+        <p className="text-muted">Pagado y aún sin factura: la emite el administrador.</p>
       ) : (
         <div className="space-y-3">
           <p className="text-muted">Este pedido aún no tiene factura. Al generarla, el comprador la verá en “Mis facturas”.</p>
@@ -79,6 +82,7 @@ function InvoiceCard({ order }: { order: Order }) {
 }
 
 function ShipmentCard({ order }: { order: Order }) {
+  const readOnly = useIsSupervisor();
   const shipment = useQuery({
     queryKey: ["shipment", "order", order.id],
     queryFn: ({ signal }) => notFoundAsNull(shipmentsApi.byOrder(order.id, signal)),
@@ -101,10 +105,15 @@ function ShipmentCard({ order }: { order: Order }) {
         </div>
       ) : order.status === "PAID" ? (
         <p className="text-muted">
-          Pagado y sin envío.{" "}
-          <Link to="/envios" className="text-brand-fg hover:underline">
-            Crear envío
-          </Link>
+          Pagado y sin envío.
+          {!readOnly && (
+            <>
+              {" "}
+              <Link to="/envios" className="text-brand-fg hover:underline">
+                Crear envío
+              </Link>
+            </>
+          )}
         </p>
       ) : (
         <p className="text-muted">Se crea cuando el pedido esté pagado.</p>
