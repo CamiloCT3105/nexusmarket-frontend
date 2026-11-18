@@ -11,7 +11,7 @@ export const USER_STATUS: Record<UserStatus, { label: string; tone: Tone }> = {
 
 export const COMMERCIAL_STATUS: Record<CommercialStatus, { label: string; tone: Tone; help: string }> = {
   ACTIVE: { label: "Comercialmente activo", tone: "neutral", help: "Opera con normalidad en el marketplace." },
-  RESTRICTED: { label: "Restringido", tone: "warning", help: "Marcado para seguimiento comercial (por ejemplo, devoluciones frecuentes)." },
+  RESTRICTED: { label: "Restringido", tone: "warning", help: "No puede confirmar pedidos; conserva su acceso, su carrito y sus pedidos." },
 };
 
 // Qué implica cada rol al asignarlo, para que el administrador decida con contexto

@@ -341,7 +341,7 @@ function BuyerSection({ user }: { user: User }) {
                 onCancel={() => setConfirming(false)}
               >
                 {target === "RESTRICTED"
-                  ? `¿Marcar a ${user.fullName} como restringido comercialmente? Es una marca de seguimiento: no bloquea su acceso ni sus compras.`
+                  ? `¿Marcar a ${user.fullName} como restringido comercialmente? No podrá confirmar pedidos hasta que quites la restricción; conserva su acceso, su carrito y sus pedidos.`
                   : `¿Quitar la restricción comercial de ${user.fullName}?`}
               </Confirm>
             ) : (

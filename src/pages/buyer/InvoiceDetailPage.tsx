@@ -58,6 +58,8 @@ export function InvoiceDetailPage() {
   }
 
   const data = invoice.data;
+  // Dirección de entrega del pedido; en pedidos anteriores a ese dato, la principal del comprador
+  const deliveryAddress = order.data.shippingAddress ?? profile.data?.primaryAddress;
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div className="flex items-center justify-between print:hidden">
@@ -92,7 +94,7 @@ export function InvoiceDetailPage() {
             ) : (
               <p className="mt-1 text-muted">Cliente #{shortId(data.buyerId)}</p>
             )}
-            {profile.data && <p className="text-muted">{formatAddress(profile.data.primaryAddress)}</p>}
+            {deliveryAddress && <p className="text-muted">{formatAddress(deliveryAddress)}</p>}
           </div>
           <div className="sm:text-right">
             <p className="text-xs tracking-widest text-muted uppercase">Pedido</p>

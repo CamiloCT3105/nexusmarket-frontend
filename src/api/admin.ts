@@ -44,7 +44,7 @@ export const adminSellersApi = {
 
 export const adminBuyersApi = {
   setCommercialStatus: (userId: string, status: CommercialStatus) =>
-    api<Buyer>(`/api/buyers/${enc(userId)}/commercial-status`, { method: "PATCH", body: { status } }),
+    api<Buyer>(`/api/buyers/${enc(userId)}/commercial-status`, { method: "PATCH", body: { commercialStatus: status } }),
 };
 
 export const adminWarehousesApi = {

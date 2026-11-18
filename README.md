@@ -153,12 +153,13 @@ Abre `http://localhost:5173`.
 
 **Unitarias y de componentes** (`src/**/*.test.ts(x)`, Vitest + Testing Library, sin backend): validaciones, cliente HTTP (filtros, token, errores, sesión vencida), guardias de ruta por rol, gráficos de reportes, confirmaciones, el formulario de inventario (solo productos del dueño de la bodega) y las devoluciones en modo consulta del supervisor.
 
-**De punta a punta** (`e2e/`, Playwright): recorre la plataforma como lo haría una persona, con cuatro sesiones en el navegador:
+**De punta a punta** (`e2e/`, Playwright): recorre la plataforma como lo haría una persona, con varias sesiones en el navegador:
 
-1. El **comprador** se registra, completa su perfil, agrega un producto, confirma el pedido (se reserva la unidad) y paga.
+1. El **comprador** se registra, completa su perfil, agrega una dirección de oficina, compra eligiéndola como dirección de entrega (se reserva la unidad) y paga.
 2. El **administrador** genera la factura y el comprador la ve.
-3. El **operador logístico** crea el envío, lo despacha (la unidad sale del inventario) y confirma la entrega.
+3. El **operador logístico** ve a dónde entregar, crea el envío, lo despacha (la unidad sale del inventario) y confirma la entrega.
 4. El comprador ve su pedido entregado, y cada rol queda fuera de las pantallas que no le corresponden.
+5. El **administrador** restringe comercialmente al comprador: conserva su carrito pero no puede confirmar; al quitar la restricción vuelve a poder.
 
 Los datos (vendedor habilitado, bodega, producto con stock y operador) se crean por la API con un sufijo único en cada ejecución, así no dependen de datos previos. Necesitan un backend de **desarrollo o pruebas** (nunca producción):
 
@@ -236,11 +237,11 @@ src/
 - **Aprobar o rechazar una devolución pide confirmación:** no se puede deshacer, y aprobar reingresa el stock y genera el reembolso.
 - **Despachar y entregar piden confirmación:** ninguno de los dos se puede deshacer, y despachar descuenta el inventario.
 - **En una bodega de vendedor solo se ingresan productos de ese vendedor** (en las del marketplace, de cualquiera). El backend lo permite, pero el formulario evita el error.
-- **El operador no ve la dirección del comprador:** el backend no le da acceso al perfil del comprador. Queda como mejora del backend.
+- **Dirección de entrega en el pedido:** en el carrito el comprador elige a cuál de sus direcciones se envía (principal por defecto) y el pedido guarda una copia. El operador logístico la ve en cada envío ("Entregar en"), igual que el comprador, el administrador y la factura; el vendedor no la recibe. Los pedidos anteriores a este dato lo indican.
 - **Las facturas no se generan solas al pagar:** las emite el administrador desde el detalle del pedido (así lo define el backend).
 - **El administrador no puede bloquearse ni cambiarse el rol a sí mismo,** para no quedarse sin acceso. El backend no lo impide; lo evita la interfaz.
 - **Bloquear, cambiar rol, completar un reembolso, reasignar una bodega o moderar un producto piden confirmación.** El cambio de rol aplica de inmediato porque el backend lee el rol actual en cada petición.
-- **El estado comercial "restringido" es solo una marca:** el backend no limita las compras de un comprador restringido, y la interfaz lo dice al confirmar.
+- **Un comprador restringido comercialmente no puede confirmar pedidos** (así lo define la especificación): conserva su acceso y su carrito, y el carrito le explica por qué no puede continuar.
 - **Reasignar una bodega no cambia el dueño de lo que ya tiene guardado:** la interfaz lo advierte y lo recomienda para bodegas vacías o mal asignadas.
 - **Con muchas secciones (administrador y supervisor), la barra completa aparece desde 1280 px** y sin el enlace "Inicio" (el logo lleva ahí); en pantallas menores se usa el menú.
 - **Gráficos sin librería:** barras horizontales de una sola serie en morado (el color marca magnitud, no categorías), con la etiqueta y el valor siempre en texto y el detalle (participación sobre el total) al pasar el cursor o enfocar la fila. Lo que es una sola cifra se muestra como tarjeta, no como gráfico.

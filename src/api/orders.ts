@@ -10,8 +10,9 @@ export const ordersApi = {
 
   get: (id: string, signal?: AbortSignal) => api<SellerOrder>(`/api/orders/${encodeURIComponent(id)}`, { signal }),
 
-  // Convierte el carrito en un pedido: valida stock, reserva unidades y vacía el carrito
-  checkout: () => api<Order>("/api/orders/checkout", { method: "POST" }),
+  // Convierte el carrito en un pedido: valida stock, reserva unidades y vacía el carrito.
+  // addressIndex: dirección de entrega (0 = principal, 1.. = adicionales en orden); el pedido guarda una copia.
+  checkout: (addressIndex = 0) => api<Order>("/api/orders/checkout", { method: "POST", body: { addressIndex } }),
 
   // Pago simulado: PENDING_PAYMENT → PAID
   pay: (id: string) => api<Order>(`/api/orders/${encodeURIComponent(id)}/pay`, { method: "POST" }),
