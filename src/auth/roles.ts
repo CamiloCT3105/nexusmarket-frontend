@@ -11,10 +11,11 @@ export const ROLES: Record<UserRole, { label: string; description: string; modul
     description: "Explora el catálogo, compra y sigue tus pedidos.",
     modules: [
       { title: "Catálogo", description: "Busca y filtra productos publicados.", to: "/catalogo" },
-      { title: "Mi perfil y direcciones", description: "Dirección principal y adicionales para tus entregas." },
-      { title: "Carrito y checkout", description: "Arma tu pedido y confirma la compra." },
-      { title: "Mis pedidos", description: "Estado, factura y seguimiento del envío." },
-      { title: "Devoluciones y reembolsos", description: "Solicita devoluciones de pedidos entregados." },
+      { title: "Mi perfil y direcciones", description: "Dirección principal y adicionales para tus entregas.", to: "/perfil" },
+      { title: "Carrito y checkout", description: "Arma tu pedido y confirma la compra.", to: "/carrito" },
+      { title: "Mis pedidos", description: "Pago, estado y seguimiento del envío.", to: "/pedidos" },
+      { title: "Mis facturas", description: "Facturas de tus pedidos pagados, listas para imprimir.", to: "/facturas" },
+      { title: "Devoluciones y reembolsos", description: "Solicita devoluciones de pedidos entregados.", to: "/devoluciones" },
     ],
   },
   SELLER: {

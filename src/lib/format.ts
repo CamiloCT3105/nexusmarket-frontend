@@ -21,3 +21,9 @@ export function formatDateTime(value: string | Date): string {
 export function shortId(id: string): string {
   return id.slice(0, 8).toUpperCase();
 }
+
+const dateOnly = new Intl.DateTimeFormat("es-CO", { dateStyle: "long" });
+
+export function formatDate(value: string | Date): string {
+  return dateOnly.format(typeof value === "string" ? new Date(value) : value);
+}
