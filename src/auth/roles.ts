@@ -23,10 +23,10 @@ export const ROLES: Record<UserRole, { label: string; description: string; modul
     description: "Publica tus productos y administra tu inventario.",
     modules: [
       { title: "Catálogo", description: "Tus productos en cualquier estado y los publicados de otros.", to: "/catalogo" },
-      { title: "Mis productos", description: "Crear productos, variantes y cambiar su estado." },
-      { title: "Bodegas e inventario", description: "Ingresos de mercancía y unidades dañadas." },
-      { title: "Pedidos", description: "Pedidos que incluyen tus productos (solo tus líneas)." },
-      { title: "Devoluciones", description: "Aprueba o rechaza devoluciones de tus productos." },
+      { title: "Mis productos", description: "Crear productos, variantes y cambiar su estado.", to: "/productos" },
+      { title: "Bodegas e inventario", description: "Ingresos de mercancía y unidades dañadas.", to: "/inventario" },
+      { title: "Pedidos", description: "Pedidos que incluyen tus productos (solo tus líneas).", to: "/pedidos" },
+      { title: "Devoluciones", description: "Aprueba o rechaza devoluciones de tus productos.", to: "/devoluciones" },
     ],
   },
   LOGISTICS_OPERATOR: {

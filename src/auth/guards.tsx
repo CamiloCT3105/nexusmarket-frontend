@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { Navigate, Outlet, useLocation } from "react-router";
 import type { UserRole } from "@/api/types";
 import { Spinner } from "@/components/ui/Spinner";
@@ -38,4 +38,11 @@ export function RequireRole({ roles, children }: { roles: UserRole[]; children: 
     return <Navigate to="/inicio" replace />;
   }
   return <>{children}</>;
+}
+
+// Una misma ruta con una pantalla distinta por rol (ej: /pedidos del comprador y del vendedor)
+export function ByRole({ views }: { views: Partial<Record<UserRole, ReactElement>> }) {
+  const auth = useAuth();
+  const view = auth.status === "authenticated" ? views[auth.user.role] : undefined;
+  return view ?? <Navigate to="/inicio" replace />;
 }

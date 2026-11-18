@@ -17,7 +17,10 @@ Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vended
 | Comprador: pedidos (pago simulado, factura y seguimiento del envío) | ✅ |
 | Comprador: facturas imprimibles | ✅ |
 | Comprador: devoluciones y reembolsos | ✅ |
-| Vendedor, operador logístico, administrador y supervisor | Próximas fases |
+| Vendedor: productos, variantes y estado | ✅ |
+| Vendedor: bodegas e inventario (ingresos y unidades dañadas) | ✅ |
+| Vendedor: pedidos con sus productos y devoluciones (aprobar / rechazar) | ✅ |
+| Operador logístico, administrador y supervisor | Próximas fases |
 
 ## Pantallas del comprador
 
@@ -31,6 +34,19 @@ Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vended
 | `/devoluciones` | Devoluciones y reembolsos |
 
 Flujo: **completar perfil → agregar al carrito → confirmar pedido → pagar** → (el administrador emite la factura y el operador logístico despacha y entrega) → **solicitar devolución** → (el vendedor la aprueba y se genera el reembolso).
+
+## Pantallas del vendedor
+
+| Ruta | Pantalla |
+|---|---|
+| `/productos` | Sus productos en cualquier estado, con búsqueda y filtro |
+| `/productos/nuevo` | Crear producto (se publica de inmediato) |
+| `/productos/:id` | Estado (publicar, suspender, descontinuar), variantes e inventario por bodega |
+| `/inventario` | Existencias por bodega, ingresos y unidades dañadas; pestaña de bodegas propias |
+| `/pedidos`, `/pedidos/:id` | Pedidos con sus productos: solo sus líneas y su parte del total |
+| `/devoluciones` | Devoluciones de sus productos, con aprobación o rechazo |
+
+Flujo: (el administrador lo habilita como vendedor) → **crear bodega → crear producto → registrar ingreso** → el comprador compra → **revisar devoluciones**.
 
 ## Stack
 
@@ -98,10 +114,10 @@ src/
 ├── auth/           # Sesión, guardias de ruta y configuración de roles
 ├── components/
 │   └── ui/         # Botón, campos, tarjeta, etiqueta, alerta, paginación…
-├── features/       # Piezas de cada módulo: catálogo, comprador (perfil, carrito), pedidos
+├── features/       # Piezas de cada módulo: catálogo, comprador, pedidos, vendedor (inventario)
 ├── layouts/        # Estructura con sesión (barra superior) y sin sesión (acceso)
 ├── lib/            # Utilidades: formato de moneda y fechas, clases, debounce
-├── pages/          # Una pantalla por ruta (pages/buyer: pantallas del comprador)
+├── pages/          # Una pantalla por ruta (pages/buyer, pages/seller)
 ├── theme/          # Tema claro/oscuro
 ├── index.css       # Paleta y estilos base
 ├── main.tsx        # Punto de entrada
@@ -121,5 +137,9 @@ src/
 - **El total del carrito es informativo:** usa el precio actual del catálogo; el precio definitivo lo fija el backend al confirmar el pedido.
 - **El pago es simulado** (`POST /api/orders/:id/pay`): no se pide ningún medio de pago.
 - **Factura y envío pueden no existir todavía:** un 404 se muestra como "pendiente", no como error.
+- **Misma ruta, pantalla por rol:** `/pedidos` y `/devoluciones` muestran la vista del comprador o la del vendedor según la sesión (`ByRole`), así la navegación es la misma para todos.
+- **La cuenta de vendedor la habilita el administrador.** Mientras `GET /api/sellers/:id` responda 404, las pantallas del vendedor explican que falta ese paso.
+- **El vendedor solo ve sus líneas** de cada pedido y su subtotal (lo filtra el backend). El envío lo gestiona el operador logístico.
+- **Aprobar o rechazar una devolución pide confirmación:** no se puede deshacer, y aprobar reingresa el stock y genera el reembolso.
 - **Al imprimir una factura** se ocultan la barra y los botones y se usa siempre la paleta clara.
 - **Sin imágenes de producto** (el backend aún no las guarda): cada producto muestra una ilustración según su tipo.

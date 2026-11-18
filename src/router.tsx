@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
-import { RequireAuth, RequireGuest, RequireRole } from "@/auth/guards";
+import { ByRole, RequireAuth, RequireGuest, RequireRole } from "@/auth/guards";
 import { AppLayout } from "@/layouts/AppLayout";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { CatalogPage } from "@/pages/CatalogPage";
@@ -16,8 +16,16 @@ import { OrderDetailPage } from "@/pages/buyer/OrderDetailPage";
 import { OrdersPage } from "@/pages/buyer/OrdersPage";
 import { ProfilePage } from "@/pages/buyer/ProfilePage";
 import { ReturnsPage } from "@/pages/buyer/ReturnsPage";
+import { InventoryPage } from "@/pages/seller/InventoryPage";
+import { ProductFormPage } from "@/pages/seller/ProductFormPage";
+import { SellerOrderDetailPage } from "@/pages/seller/SellerOrderDetailPage";
+import { SellerOrdersPage } from "@/pages/seller/SellerOrdersPage";
+import { SellerProductDetailPage } from "@/pages/seller/SellerProductDetailPage";
+import { SellerProductsPage } from "@/pages/seller/SellerProductsPage";
+import { SellerReturnsPage } from "@/pages/seller/SellerReturnsPage";
 
 const buyer = (element: ReactElement) => <RequireRole roles={["BUYER"]}>{element}</RequireRole>;
+const seller = (element: ReactElement) => <RequireRole roles={["SELLER"]}>{element}</RequireRole>;
 
 export const router = createBrowserRouter([
   // Acceso (solo sin sesión)
@@ -47,11 +55,17 @@ export const router = createBrowserRouter([
           // Comprador
           { path: "/perfil", element: buyer(<ProfilePage />) },
           { path: "/carrito", element: buyer(<CartPage />) },
-          { path: "/pedidos", element: buyer(<OrdersPage />) },
-          { path: "/pedidos/:id", element: buyer(<OrderDetailPage />) },
+          // Pedidos y devoluciones: misma ruta, pantalla según el rol
+          { path: "/pedidos", element: <ByRole views={{ BUYER: <OrdersPage />, SELLER: <SellerOrdersPage /> }} /> },
+          { path: "/pedidos/:id", element: <ByRole views={{ BUYER: <OrderDetailPage />, SELLER: <SellerOrderDetailPage /> }} /> },
           { path: "/facturas", element: buyer(<InvoicesPage />) },
           { path: "/facturas/:id", element: buyer(<InvoiceDetailPage />) },
-          { path: "/devoluciones", element: buyer(<ReturnsPage />) },
+          { path: "/devoluciones", element: <ByRole views={{ BUYER: <ReturnsPage />, SELLER: <SellerReturnsPage /> }} /> },
+          // Vendedor
+          { path: "/productos", element: seller(<SellerProductsPage />) },
+          { path: "/productos/nuevo", element: seller(<ProductFormPage />) },
+          { path: "/productos/:id", element: seller(<SellerProductDetailPage />) },
+          { path: "/inventario", element: seller(<InventoryPage />) },
           { path: "*", element: <NotFoundPage /> },
         ],
       },

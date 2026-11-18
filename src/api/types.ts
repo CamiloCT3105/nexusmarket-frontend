@@ -90,3 +90,21 @@ export type ReturnRequest = {
 
 export type RefundStatus = "PENDING" | "COMPLETED";
 export type Refund = { id: string; returnId: string; amount: number; status: RefundStatus; createdAt: string };
+
+// ─── Vendedor ──────────────────────────────────────────────────────────────────
+
+export type Seller = { userId: string; warehouseIds: string[] };
+
+export type WarehouseType = "MARKETPLACE" | "SELLER";
+export type Warehouse = { id: string; type: WarehouseType; sellerId?: string; location: string };
+
+export type InventoryItem = {
+  productId: string;
+  warehouseId: string;
+  quantity: number;
+  reservedQuantity: number;
+  damagedQuantity: number;
+};
+
+// Un vendedor recibe solo sus líneas del pedido y el subtotal de ellas
+export type SellerOrder = Order & { sellerSubtotal?: number };
