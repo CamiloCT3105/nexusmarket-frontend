@@ -47,7 +47,7 @@ export function AdminOrdersPage() {
         if (!("pagina" in changes)) next.delete("pagina");
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
 
   return (

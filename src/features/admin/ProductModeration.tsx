@@ -52,7 +52,8 @@ export function ProductModeration({ product }: { product: Product }) {
           onConfirm={() => change.mutate(target)}
           onCancel={() => setTarget(null)}
         >
-          ¿Pasar “{product.name}” de {STATUS_LABEL[product.status].toLowerCase()} a {STATUS_LABEL[target].toLowerCase()}? {MODERATION[target].effect}
+          ¿Pasar “{product.name}” de {STATUS_LABEL[product.status].toLowerCase()} a {STATUS_LABEL[target].toLowerCase()}?{" "}
+          {MODERATION[target].effect}
         </Confirm>
       ) : (
         <div className="flex flex-wrap gap-2">

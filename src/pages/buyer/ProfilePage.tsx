@@ -26,7 +26,11 @@ function AddressCard({ address, primary }: { address: Address; primary?: boolean
           {address.city}, {address.country} · CP {address.postalCode}
         </p>
       </div>
-      {primary && <Badge tone="brand" className="ml-auto self-start">Principal</Badge>}
+      {primary && (
+        <Badge tone="brand" className="ml-auto self-start">
+          Principal
+        </Badge>
+      )}
     </div>
   );
 }
@@ -102,7 +106,15 @@ export function ProfilePage() {
               <div className="flex items-center justify-between gap-3">
                 <h2 className="text-lg font-semibold">Direcciones</h2>
                 {!adding && (
-                  <Button variant="secondary" size="sm" icon={<Plus className="size-4" />} onClick={() => { setAdding(true); setNotice(null); }}>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<Plus className="size-4" />}
+                    onClick={() => {
+                      setAdding(true);
+                      setNotice(null);
+                    }}
+                  >
                     Agregar
                   </Button>
                 )}

@@ -92,7 +92,8 @@ function AdvanceCard({ shipment }: { shipment: Shipment }) {
       {confirming ? (
         <div className="space-y-2 rounded-xl bg-surface-2/60 p-3 text-sm">
           <p>
-            ¿{next.action} el envío <span className="font-mono">{shipment.trackingCode}</span>? <span className="text-muted">No se puede deshacer.</span>
+            ¿{next.action} el envío <span className="font-mono">{shipment.trackingCode}</span>?{" "}
+            <span className="text-muted">No se puede deshacer.</span>
           </p>
           <div className="flex justify-end gap-2">
             <Button size="sm" variant="ghost" disabled={advance.isPending} onClick={() => setConfirming(false)}>
@@ -150,7 +151,9 @@ export function ShipmentDetailPage() {
   return (
     <div className="space-y-6">
       {back}
-      {created && data.status === "PREPARING" && <Alert tone="success">Envío creado con la guía {data.trackingCode}. Cuando salga de bodega, márcalo como despachado.</Alert>}
+      {created && data.status === "PREPARING" && (
+        <Alert tone="success">Envío creado con la guía {data.trackingCode}. Cuando salga de bodega, márcalo como despachado.</Alert>
+      )}
 
       <div>
         <div className="flex flex-wrap items-center gap-3">

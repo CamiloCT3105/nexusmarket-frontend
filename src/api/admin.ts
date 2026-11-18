@@ -1,5 +1,18 @@
 import { api } from "./client";
-import type { Buyer, CommercialStatus, Invoice, Page, Refund, RefundStatus, Seller, User, UserRole, UserStatus, Warehouse, WarehouseType } from "./types";
+import type {
+  Buyer,
+  CommercialStatus,
+  Invoice,
+  Page,
+  Refund,
+  RefundStatus,
+  Seller,
+  User,
+  UserRole,
+  UserStatus,
+  Warehouse,
+  WarehouseType,
+} from "./types";
 
 // Operaciones exclusivas del administrador. El backend vuelve a validar el rol en cada una.
 

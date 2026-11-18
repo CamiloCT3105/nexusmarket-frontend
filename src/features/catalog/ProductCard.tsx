@@ -18,7 +18,7 @@ export function ProductCard({ product, showStatus }: { product: Product; showSta
             <Badge tone="brand">{TYPE_LABEL[product.type]}</Badge>
             {showStatus && <Badge tone={STATUS_TONE[product.status]}>{STATUS_LABEL[product.status]}</Badge>}
           </div>
-          <h3 className="line-clamp-2 font-semibold leading-snug group-hover:text-brand-fg">{product.name}</h3>
+          <h3 className="line-clamp-2 leading-snug font-semibold group-hover:text-brand-fg">{product.name}</h3>
           {product.description && <p className="line-clamp-2 text-sm text-muted">{product.description}</p>}
           <div className="mt-auto flex items-end justify-between gap-2 pt-2">
             <p className="font-display text-xl font-semibold">{formatMoney(product.price)}</p>

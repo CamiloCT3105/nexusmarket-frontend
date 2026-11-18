@@ -223,7 +223,8 @@ export function AdminOrderDetailPage() {
                     {product?.name ?? `Producto ${shortId(item.productId)}`}
                   </Link>
                   <p className="text-sm text-muted">
-                    {item.quantity} × {formatMoney(item.unitPrice)} · {locations.get(item.warehouseId) ?? `Bodega ${shortId(item.warehouseId)}`}
+                    {item.quantity} × {formatMoney(item.unitPrice)} ·{" "}
+                    {locations.get(item.warehouseId) ?? `Bodega ${shortId(item.warehouseId)}`}
                   </p>
                 </div>
                 <p className="font-semibold tabular-nums">{formatMoney(item.quantity * item.unitPrice)}</p>

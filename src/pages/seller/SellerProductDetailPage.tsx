@@ -139,7 +139,14 @@ function VariantsSection({ product }: { product: Product }) {
         <form onSubmit={submit} noValidate className="mt-4 space-y-3 border-t border-border pt-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <Input label="Nombre" placeholder="Color" value={name} onChange={(event) => setName(event.target.value)} maxLength={40} />
-            <Input label="Valor" placeholder="Rojo" value={value} onChange={(event) => setValue(event.target.value)} maxLength={60} error={error} />
+            <Input
+              label="Valor"
+              placeholder="Rojo"
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              maxLength={60}
+              error={error}
+            />
           </div>
           {add.error && <Alert tone="error">{errorMessage(add.error, "No se pudo agregar la variante.")}</Alert>}
           <div className="flex justify-end gap-2">
@@ -194,11 +201,19 @@ function StockSection({ product, warehouses }: { product: Product; warehouses: W
         <div className="space-y-4">
           {adding && (
             <Card className="bg-surface-2/40 p-4">
-              <StockForm mode="inbound" productId={product.id} warehouses={free} onDone={() => setAdding(false)} onCancel={() => setAdding(false)} />
+              <StockForm
+                mode="inbound"
+                productId={product.id}
+                warehouses={free}
+                onDone={() => setAdding(false)}
+                onCancel={() => setAdding(false)}
+              />
             </Card>
           )}
           {items.length === 0 && !adding ? (
-            <p className="text-sm text-muted">Sin existencias registradas: los compradores no podrán comprarlo hasta que registres un ingreso.</p>
+            <p className="text-sm text-muted">
+              Sin existencias registradas: los compradores no podrán comprarlo hasta que registres un ingreso.
+            </p>
           ) : (
             <InventoryList
               items={items}
@@ -267,7 +282,10 @@ export function SellerProductDetailPage() {
           <p className="font-display text-2xl font-semibold tabular-nums">{formatMoney(data.price)}</p>
           <Link
             to={`/catalogo/${data.id}`}
-            className={cn("inline-flex items-center gap-1 text-sm text-brand-fg hover:underline", data.status !== "PUBLISHED" && "text-muted")}
+            className={cn(
+              "inline-flex items-center gap-1 text-sm text-brand-fg hover:underline",
+              data.status !== "PUBLISHED" && "text-muted",
+            )}
           >
             Ver en el catálogo <ExternalLink className="size-3.5" />
           </Link>

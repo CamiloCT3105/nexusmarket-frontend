@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { lazy, type ComponentType, type ReactElement } from "react";
 import { createBrowserRouter, Navigate } from "react-router";
 import { ByRole, RequireAuth, RequireGuest, RequireRole } from "@/auth/guards";
 import { AppLayout } from "@/layouts/AppLayout";
@@ -9,30 +9,36 @@ import { LoginPage } from "@/pages/LoginPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ProductDetailPage } from "@/pages/ProductDetailPage";
 import { RegisterPage } from "@/pages/RegisterPage";
-import { AdminOrderDetailPage } from "@/pages/admin/AdminOrderDetailPage";
-import { AdminOrdersPage } from "@/pages/admin/AdminOrdersPage";
-import { AdminReturnsPage } from "@/pages/admin/AdminReturnsPage";
-import { CreateUserPage } from "@/pages/admin/CreateUserPage";
-import { UserDetailPage } from "@/pages/admin/UserDetailPage";
-import { UsersPage } from "@/pages/admin/UsersPage";
-import { ReportsPage } from "@/pages/reports/ReportsPage";
-import { CartPage } from "@/pages/buyer/CartPage";
-import { InvoiceDetailPage } from "@/pages/buyer/InvoiceDetailPage";
-import { InvoicesPage } from "@/pages/buyer/InvoicesPage";
-import { OrderDetailPage } from "@/pages/buyer/OrderDetailPage";
-import { OrdersPage } from "@/pages/buyer/OrdersPage";
-import { ProfilePage } from "@/pages/buyer/ProfilePage";
-import { ReturnsPage } from "@/pages/buyer/ReturnsPage";
-import { LogisticsInventoryPage } from "@/pages/logistics/LogisticsInventoryPage";
-import { ShipmentDetailPage } from "@/pages/logistics/ShipmentDetailPage";
-import { ShipmentsPage } from "@/pages/logistics/ShipmentsPage";
-import { InventoryPage } from "@/pages/seller/InventoryPage";
-import { ProductFormPage } from "@/pages/seller/ProductFormPage";
-import { SellerOrderDetailPage } from "@/pages/seller/SellerOrderDetailPage";
-import { SellerOrdersPage } from "@/pages/seller/SellerOrdersPage";
-import { SellerProductDetailPage } from "@/pages/seller/SellerProductDetailPage";
-import { SellerProductsPage } from "@/pages/seller/SellerProductsPage";
-import { SellerReturnsPage } from "@/pages/seller/SellerReturnsPage";
+
+// Pantallas de cada rol: se descargan solo al abrirlas (code splitting). Inicio, catálogo y acceso van en el paquete principal.
+function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) {
+  return lazy(async () => ({ default: (await load())[name] }));
+}
+
+const AdminOrderDetailPage = page(() => import("@/pages/admin/AdminOrderDetailPage"), "AdminOrderDetailPage");
+const AdminOrdersPage = page(() => import("@/pages/admin/AdminOrdersPage"), "AdminOrdersPage");
+const AdminReturnsPage = page(() => import("@/pages/admin/AdminReturnsPage"), "AdminReturnsPage");
+const CreateUserPage = page(() => import("@/pages/admin/CreateUserPage"), "CreateUserPage");
+const UserDetailPage = page(() => import("@/pages/admin/UserDetailPage"), "UserDetailPage");
+const UsersPage = page(() => import("@/pages/admin/UsersPage"), "UsersPage");
+const ReportsPage = page(() => import("@/pages/reports/ReportsPage"), "ReportsPage");
+const CartPage = page(() => import("@/pages/buyer/CartPage"), "CartPage");
+const InvoiceDetailPage = page(() => import("@/pages/buyer/InvoiceDetailPage"), "InvoiceDetailPage");
+const InvoicesPage = page(() => import("@/pages/buyer/InvoicesPage"), "InvoicesPage");
+const OrderDetailPage = page(() => import("@/pages/buyer/OrderDetailPage"), "OrderDetailPage");
+const OrdersPage = page(() => import("@/pages/buyer/OrdersPage"), "OrdersPage");
+const ProfilePage = page(() => import("@/pages/buyer/ProfilePage"), "ProfilePage");
+const ReturnsPage = page(() => import("@/pages/buyer/ReturnsPage"), "ReturnsPage");
+const LogisticsInventoryPage = page(() => import("@/pages/logistics/LogisticsInventoryPage"), "LogisticsInventoryPage");
+const ShipmentDetailPage = page(() => import("@/pages/logistics/ShipmentDetailPage"), "ShipmentDetailPage");
+const ShipmentsPage = page(() => import("@/pages/logistics/ShipmentsPage"), "ShipmentsPage");
+const InventoryPage = page(() => import("@/pages/seller/InventoryPage"), "InventoryPage");
+const ProductFormPage = page(() => import("@/pages/seller/ProductFormPage"), "ProductFormPage");
+const SellerOrderDetailPage = page(() => import("@/pages/seller/SellerOrderDetailPage"), "SellerOrderDetailPage");
+const SellerOrdersPage = page(() => import("@/pages/seller/SellerOrdersPage"), "SellerOrdersPage");
+const SellerProductDetailPage = page(() => import("@/pages/seller/SellerProductDetailPage"), "SellerProductDetailPage");
+const SellerProductsPage = page(() => import("@/pages/seller/SellerProductsPage"), "SellerProductsPage");
+const SellerReturnsPage = page(() => import("@/pages/seller/SellerReturnsPage"), "SellerReturnsPage");
 
 const buyer = (element: ReactElement) => <RequireRole roles={["BUYER"]}>{element}</RequireRole>;
 const seller = (element: ReactElement) => <RequireRole roles={["SELLER"]}>{element}</RequireRole>;
@@ -71,17 +77,60 @@ export const router = createBrowserRouter([
           { path: "/perfil", element: buyer(<ProfilePage />) },
           { path: "/carrito", element: buyer(<CartPage />) },
           // Pedidos y devoluciones: misma ruta, pantalla según el rol
-          { path: "/pedidos", element: <ByRole views={{ BUYER: <OrdersPage />, SELLER: <SellerOrdersPage />, ADMIN: <AdminOrdersPage />, SUPERVISOR: <AdminOrdersPage /> }} /> },
-          { path: "/pedidos/:id", element: <ByRole views={{ BUYER: <OrderDetailPage />, SELLER: <SellerOrderDetailPage />, ADMIN: <AdminOrderDetailPage />, SUPERVISOR: <AdminOrderDetailPage /> }} /> },
+          {
+            path: "/pedidos",
+            element: (
+              <ByRole
+                views={{ BUYER: <OrdersPage />, SELLER: <SellerOrdersPage />, ADMIN: <AdminOrdersPage />, SUPERVISOR: <AdminOrdersPage /> }}
+              />
+            ),
+          },
+          {
+            path: "/pedidos/:id",
+            element: (
+              <ByRole
+                views={{
+                  BUYER: <OrderDetailPage />,
+                  SELLER: <SellerOrderDetailPage />,
+                  ADMIN: <AdminOrderDetailPage />,
+                  SUPERVISOR: <AdminOrderDetailPage />,
+                }}
+              />
+            ),
+          },
           { path: "/facturas", element: invoices(<InvoicesPage />) },
           { path: "/facturas/:id", element: invoices(<InvoiceDetailPage />) },
-          { path: "/devoluciones", element: <ByRole views={{ BUYER: <ReturnsPage />, SELLER: <SellerReturnsPage />, ADMIN: <AdminReturnsPage />, SUPERVISOR: <AdminReturnsPage /> }} /> },
+          {
+            path: "/devoluciones",
+            element: (
+              <ByRole
+                views={{
+                  BUYER: <ReturnsPage />,
+                  SELLER: <SellerReturnsPage />,
+                  ADMIN: <AdminReturnsPage />,
+                  SUPERVISOR: <AdminReturnsPage />,
+                }}
+              />
+            ),
+          },
           // Vendedor
           { path: "/productos", element: seller(<SellerProductsPage />) },
           { path: "/productos/nuevo", element: seller(<ProductFormPage />) },
           { path: "/productos/:id", element: seller(<SellerProductDetailPage />) },
           // Inventario: el vendedor ve sus bodegas; el operador logístico y el administrador, todas
-          { path: "/inventario", element: <ByRole views={{ SELLER: <InventoryPage />, LOGISTICS_OPERATOR: <LogisticsInventoryPage />, ADMIN: <LogisticsInventoryPage />, SUPERVISOR: <LogisticsInventoryPage /> }} /> },
+          {
+            path: "/inventario",
+            element: (
+              <ByRole
+                views={{
+                  SELLER: <InventoryPage />,
+                  LOGISTICS_OPERATOR: <LogisticsInventoryPage />,
+                  ADMIN: <LogisticsInventoryPage />,
+                  SUPERVISOR: <LogisticsInventoryPage />,
+                }}
+              />
+            ),
+          },
           // Operador logístico y administrador
           { path: "/envios", element: shipping(<ShipmentsPage />) },
           { path: "/envios/:id", element: shipping(<ShipmentDetailPage />) },

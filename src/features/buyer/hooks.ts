@@ -50,8 +50,7 @@ export function useCartActions() {
       onSuccess,
     }),
     setQuantity: useMutation({
-      mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
-        cartApi.setQuantity(user.id, productId, quantity),
+      mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) => cartApi.setQuantity(user.id, productId, quantity),
       onSuccess,
     }),
     remove: useMutation({

@@ -1,6 +1,22 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
-import { BarChart3, Boxes, FileText, Home, LogOut, Menu, Package, RotateCcw, ShoppingCart, Store, Tags, Truck, Users, X, type LucideIcon } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  FileText,
+  Home,
+  LogOut,
+  Menu,
+  Package,
+  RotateCcw,
+  ShoppingCart,
+  Store,
+  Tags,
+  Truck,
+  Users,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import type { UserRole } from "@/api/types";
 import { useCart } from "@/features/buyer/hooks";
 import { useCurrentUser, useAuth } from "@/auth/AuthContext";
@@ -8,6 +24,7 @@ import { roleLabel } from "@/auth/roles";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Badge } from "@/components/ui/Badge";
+import { PageLoader } from "@/components/ui/PageLoader";
 import { cn } from "@/lib/cn";
 
 type NavItem = { to: string; label: string; icon: LucideIcon };
@@ -65,7 +82,7 @@ function CartButton({ onClick }: { onClick: () => void }) {
       className={({ isActive }) =>
         cn(
           "relative inline-flex size-9 items-center justify-center rounded-xl transition-colors",
-          isActive ? "bg-brand-soft text-brand-fg" : "text-muted hover:bg-surface-2 hover:text-fg"
+          isActive ? "bg-brand-soft text-brand-fg" : "text-muted hover:bg-surface-2 hover:text-fg",
         )
       }
     >
@@ -96,7 +113,7 @@ export function AppLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    void navigate("/login", { replace: true });
   };
 
   const isBuyer = user.role === "BUYER";
@@ -122,7 +139,7 @@ export function AppLayout() {
           className={({ isActive }) =>
             cn(
               "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
-              isActive ? "bg-brand-soft text-brand-fg" : "text-muted hover:bg-surface-2 hover:text-fg"
+              isActive ? "bg-brand-soft text-brand-fg" : "text-muted hover:bg-surface-2 hover:text-fg",
             )
           }
         >
@@ -186,7 +203,10 @@ export function AppLayout() {
               onClick={() => setMenuOpen((open) => !open)}
               aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={menuOpen}
-              className={cn("inline-flex size-9 items-center justify-center rounded-xl text-muted hover:bg-surface-2 hover:text-fg", wide ? "xl:hidden" : "lg:hidden")}
+              className={cn(
+                "inline-flex size-9 items-center justify-center rounded-xl text-muted hover:bg-surface-2 hover:text-fg",
+                wide ? "xl:hidden" : "lg:hidden",
+              )}
             >
               {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
@@ -220,7 +240,10 @@ export function AppLayout() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 print:p-0">
-        <Outlet />
+        {/* Mientras se descarga la pantalla de una ruta (carga diferida) */}
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

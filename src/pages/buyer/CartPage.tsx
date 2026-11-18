@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageLoader } from "@/components/ui/PageLoader";
-import { formatAddress } from "@/features/buyer/AddressForm";
+import { formatAddress } from "@/features/buyer/address";
 import { cartKey, useBuyerProfile, useCart, useCartActions, useProductsById } from "@/features/buyer/hooks";
 import { ProfileRequired } from "@/features/buyer/ProfileRequired";
 import { QuantityStepper } from "@/features/buyer/QuantityStepper";
@@ -38,7 +38,7 @@ export function CartPage() {
       // El backend vacía el carrito al confirmar el pedido
       queryClient.setQueryData<Cart>(cartKey(user.id), { buyerId: user.id, items: [] });
       void queryClient.invalidateQueries({ queryKey: ["orders"] });
-      navigate(`/pedidos/${order.id}`, { state: { created: true } });
+      void navigate(`/pedidos/${order.id}`, { state: { created: true } });
     },
   });
 

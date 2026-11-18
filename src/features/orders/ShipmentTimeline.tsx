@@ -10,10 +10,7 @@ export function ShipmentTimeline({ events }: { events: ShipmentEvent[] }) {
       {[...events].reverse().map((event, index) => (
         <li key={index} className="relative">
           <span
-            className={cn(
-              "absolute top-1.5 -left-[1.3rem] size-2 rounded-full",
-              event.status === "DELIVERED" ? "bg-accent" : "bg-brand"
-            )}
+            className={cn("absolute top-1.5 -left-[1.3rem] size-2 rounded-full", event.status === "DELIVERED" ? "bg-accent" : "bg-brand")}
           />
           <p className="font-medium">{SHIPMENT_STATUS[event.status].label}</p>
           {event.note && <p className="text-muted">{event.note}</p>}

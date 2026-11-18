@@ -33,7 +33,11 @@ export function InvoicesPage() {
     <div className="space-y-6">
       <PageHeader
         title={staff ? "Facturas" : "Mis facturas"}
-        description={staff ? "Facturas emitidas. Se generan desde el detalle de cada pedido pagado." : "Las facturas se emiten cuando un pedido ya fue pagado."}
+        description={
+          staff
+            ? "Facturas emitidas. Se generan desde el detalle de cada pedido pagado."
+            : "Las facturas se emiten cuando un pedido ya fue pagado."
+        }
       />
       {error ? (
         <Alert tone="error">{errorMessage(error, "No se pudieron cargar las facturas.")}</Alert>
@@ -43,7 +47,11 @@ export function InvoicesPage() {
         <EmptyState
           icon={<FileText className="size-6" />}
           title={staff ? "Aún no hay facturas emitidas" : "Aún no tienes facturas"}
-          description={staff ? "Genéralas desde el detalle de un pedido pagado." : "Cuando pagues un pedido y el administrador emita la factura, la verás aquí."}
+          description={
+            staff
+              ? "Genéralas desde el detalle de un pedido pagado."
+              : "Cuando pagues un pedido y el administrador emita la factura, la verás aquí."
+          }
         />
       ) : (
         <div className={cn("space-y-3 transition-opacity", isFetching && "opacity-60")}>

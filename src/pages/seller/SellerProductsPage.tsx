@@ -47,12 +47,13 @@ export function SellerProductsPage() {
         }
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
 
   // La búsqueda vive en la URL; al cambiarla se vuelve a la primera página
   useEffect(() => {
     if ((params.get("q") ?? "") !== debounced) update({ q: debounced || undefined, pagina: undefined });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reacciona solo al texto ya asentado; con más dependencias, limpiar los filtros devolvería el texto viejo
   }, [debounced]);
 
   const { data, error, isPending, isFetching } = useQuery({
@@ -82,7 +83,11 @@ export function SellerProductsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Mis productos" description="Crea productos, agrega variantes y decide cuáles se ven en el catálogo." actions={newButton} />
+      <PageHeader
+        title="Mis productos"
+        description="Crea productos, agrega variantes y decide cuáles se ven en el catálogo."
+        actions={newButton}
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="sm:w-72">
@@ -110,7 +115,11 @@ export function SellerProductsPage() {
         <EmptyState
           icon={<Tags className="size-6" />}
           title={status || debounced ? "Ningún producto coincide" : "Aún no tienes productos"}
-          description={status || debounced ? "Prueba con otro filtro o búsqueda." : "Crea tu primer producto y luego registra su inventario en una bodega."}
+          description={
+            status || debounced
+              ? "Prueba con otro filtro o búsqueda."
+              : "Crea tu primer producto y luego registra su inventario en una bodega."
+          }
           action={!status && !debounced && newButton}
         />
       ) : (

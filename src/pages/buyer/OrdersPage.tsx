@@ -102,7 +102,7 @@ export function OrdersPage() {
                     else updated.delete("pagina");
                     return updated;
                   },
-                  { replace: true }
+                  { replace: true },
                 );
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}

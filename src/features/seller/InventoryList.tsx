@@ -96,7 +96,12 @@ export function InventoryList({
                 <Button size="sm" variant="ghost" onClick={() => setOpen({ key, mode: "damaged" })}>
                   Marcar dañadas
                 </Button>
-                <Button size="sm" variant="secondary" icon={<PackagePlus className="size-4" />} onClick={() => setOpen({ key, mode: "inbound" })}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={<PackagePlus className="size-4" />}
+                  onClick={() => setOpen({ key, mode: "inbound" })}
+                >
                   Ingreso
                 </Button>
               </div>

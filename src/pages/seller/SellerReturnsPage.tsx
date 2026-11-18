@@ -99,10 +99,13 @@ export function ReturnRequests({ admin = false, readOnly = false }: { admin?: bo
               updated.delete("pagina");
               return updated;
             },
-            { replace: true }
+            { replace: true },
           )
         }
-        options={[...STATUSES.map((value) => ({ value, label: value === "REQUESTED" ? "Por revisar" : RETURN_STATUS[value].label })), { value: "ALL", label: "Todas" }]}
+        options={[
+          ...STATUSES.map((value) => ({ value, label: value === "REQUESTED" ? "Por revisar" : RETURN_STATUS[value].label })),
+          { value: "ALL", label: "Todas" },
+        ]}
       />
 
       {error ? (
@@ -154,7 +157,7 @@ export function ReturnRequests({ admin = false, readOnly = false }: { admin?: bo
                     else updated.delete("pagina");
                     return updated;
                   },
-                  { replace: true }
+                  { replace: true },
                 );
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
@@ -169,7 +172,10 @@ export function ReturnRequests({ admin = false, readOnly = false }: { admin?: bo
 export function SellerReturnsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Devoluciones" description="Solicitudes sobre tus productos. Al aprobar, el stock vuelve a la bodega de origen y se reembolsa lo pagado." />
+      <PageHeader
+        title="Devoluciones"
+        description="Solicitudes sobre tus productos. Al aprobar, el stock vuelve a la bodega de origen y se reembolsa lo pagado."
+      />
       <ReturnRequests />
     </div>
   );

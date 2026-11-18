@@ -64,7 +64,11 @@ function PaymentCard({ order }: { order: Order }) {
 
 function InvoiceCard({ order }: { order: Order }) {
   const paid = order.status !== "PENDING_PAYMENT";
-  const { data: invoice, isPending, error } = useQuery({
+  const {
+    data: invoice,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: ["invoice", "order", order.id],
     enabled: paid,
     queryFn: ({ signal }) => notFoundAsNull(invoicesApi.byOrder(order.id, signal)),
@@ -97,7 +101,11 @@ function InvoiceCard({ order }: { order: Order }) {
 
 function ShipmentCard({ order }: { order: Order }) {
   const paid = order.status !== "PENDING_PAYMENT";
-  const { data: shipment, isPending, error } = useQuery({
+  const {
+    data: shipment,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: ["shipment", "order", order.id],
     enabled: paid,
     queryFn: ({ signal }) => notFoundAsNull(shipmentsApi.byOrder(order.id, signal)),
@@ -135,7 +143,11 @@ export function OrderDetailPage() {
   const [returning, setReturning] = useState<string | null>(null);
   const [returnSent, setReturnSent] = useState(false);
 
-  const { data: order, error, isPending } = useQuery({
+  const {
+    data: order,
+    error,
+    isPending,
+  } = useQuery({
     queryKey: ["order", id],
     queryFn: ({ signal }) => ordersApi.get(id, signal),
   });

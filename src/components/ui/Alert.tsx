@@ -12,7 +12,10 @@ const tones: Record<Tone, { box: string; icon: ReactNode }> = {
 
 export function Alert({ tone = "info", children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
-    <div role={tone === "error" ? "alert" : "status"} className={cn("flex items-start gap-2 rounded-xl border px-3 py-2.5 text-sm", tones[tone].box, className)}>
+    <div
+      role={tone === "error" ? "alert" : "status"}
+      className={cn("flex items-start gap-2 rounded-xl border px-3 py-2.5 text-sm", tones[tone].box, className)}
+    >
       <span className="mt-0.5">{tones[tone].icon}</span>
       <div>{children}</div>
     </div>

@@ -16,7 +16,14 @@ export function Logo({ className, withText = true }: { className?: string; withT
           </linearGradient>
         </defs>
         <rect width="32" height="32" rx="9" className="fill-fg" />
-        <path d="M9 23V9l14 14V9" fill="none" stroke={`url(#${gradientId})`} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M9 23V9l14 14V9"
+          fill="none"
+          stroke={`url(#${gradientId})`}
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
       {withText && (
         <span className="font-display text-lg font-semibold tracking-tight">

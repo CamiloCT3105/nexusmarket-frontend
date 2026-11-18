@@ -76,7 +76,11 @@ function AddToCart({ productId }: { productId: string }) {
 export function ProductDetailPage() {
   const { id = "" } = useParams();
   const user = useCurrentUser();
-  const { data: product, error, isPending } = useQuery({
+  const {
+    data: product,
+    error,
+    isPending,
+  } = useQuery({
     queryKey: ["product", id],
     queryFn: ({ signal }) => productsApi.get(id, signal),
   });

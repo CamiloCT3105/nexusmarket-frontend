@@ -36,7 +36,7 @@ export function RegisterPage() {
         documentNumber: form.documentNumber,
         password: form.password,
       });
-      navigate("/inicio", { replace: true });
+      void navigate("/inicio", { replace: true });
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : "No se pudo completar el registro.");
     } finally {
@@ -51,8 +51,25 @@ export function RegisterPage() {
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4" noValidate>
         {serverError && <Alert tone="error">{serverError}</Alert>}
-        <Input label="Nombre completo" autoComplete="name" value={form.fullName} onChange={set("fullName")} error={errors.fullName} leading={<User className="size-4" />} placeholder="Ana Gómez" />
-        <Input label="Correo electrónico" type="email" autoComplete="email" value={form.email} onChange={set("email")} error={errors.email} leading={<Mail className="size-4" />} placeholder="tu@correo.com" />
+        <Input
+          label="Nombre completo"
+          autoComplete="name"
+          value={form.fullName}
+          onChange={set("fullName")}
+          error={errors.fullName}
+          leading={<User className="size-4" />}
+          placeholder="Ana Gómez"
+        />
+        <Input
+          label="Correo electrónico"
+          type="email"
+          autoComplete="email"
+          value={form.email}
+          onChange={set("email")}
+          error={errors.email}
+          leading={<Mail className="size-4" />}
+          placeholder="tu@correo.com"
+        />
         <Input
           label="Documento de identidad"
           value={form.documentNumber}
@@ -63,8 +80,25 @@ export function RegisterPage() {
           placeholder="1020304050"
           inputMode="text"
         />
-        <Input label="Contraseña" type="password" autoComplete="new-password" value={form.password} onChange={set("password")} error={errors.password} hint="Mínimo 8 caracteres." leading={<Lock className="size-4" />} />
-        <Input label="Confirmar contraseña" type="password" autoComplete="new-password" value={form.confirm} onChange={set("confirm")} error={errors.confirm} leading={<Lock className="size-4" />} />
+        <Input
+          label="Contraseña"
+          type="password"
+          autoComplete="new-password"
+          value={form.password}
+          onChange={set("password")}
+          error={errors.password}
+          hint="Mínimo 8 caracteres."
+          leading={<Lock className="size-4" />}
+        />
+        <Input
+          label="Confirmar contraseña"
+          type="password"
+          autoComplete="new-password"
+          value={form.confirm}
+          onChange={set("confirm")}
+          error={errors.confirm}
+          leading={<Lock className="size-4" />}
+        />
         <Button type="submit" size="lg" loading={submitting} className="mt-2">
           Crear cuenta
         </Button>
@@ -76,9 +110,7 @@ export function RegisterPage() {
           Inicia sesión
         </Link>
       </p>
-      <p className="mt-3 text-center text-xs text-muted">
-        Los vendedores no se registran aquí: los incorpora un administrador.
-      </p>
+      <p className="mt-3 text-center text-xs text-muted">Los vendedores no se registran aquí: los incorpora un administrador.</p>
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { useUsersById } from "@/features/admin/hooks";
-import { formatAddress } from "@/features/buyer/AddressForm";
+import { formatAddress } from "@/features/buyer/address";
 import { useBuyerProfile, useProductsById } from "@/features/buyer/hooks";
 import { errorMessage, notFoundAsNull } from "@/lib/errors";
 import { formatDateTime, formatMoney, shortId } from "@/lib/format";
