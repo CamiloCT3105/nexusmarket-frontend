@@ -69,6 +69,8 @@ export type Order = {
   total: number;
   status: OrderStatus;
   createdAt: string;
+  // Copia de la dirección elegida al confirmar. No llega en pedidos anteriores ni al vendedor.
+  shippingAddress?: Address;
 };
 
 export type Invoice = { id: string; orderId: string; buyerId: string; amount: number; issuedAt: string };

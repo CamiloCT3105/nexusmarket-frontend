@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, ArrowRight, Home, ShoppingBag, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, ShoppingBag, Trash2 } from "lucide-react";
 import { ordersApi } from "@/api/orders";
 import type { Cart } from "@/api/types";
 import { useCurrentUser } from "@/auth/AuthContext";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageLoader } from "@/components/ui/PageLoader";
-import { formatAddress } from "@/features/buyer/address";
+import { DeliveryAddressPicker } from "@/features/buyer/DeliveryAddressPicker";
 import { cartKey, useBuyerProfile, useCart, useCartActions, useProductsById } from "@/features/buyer/hooks";
 import { ProfileRequired } from "@/features/buyer/ProfileRequired";
 import { QuantityStepper } from "@/features/buyer/QuantityStepper";
@@ -31,9 +31,12 @@ export function CartPage() {
   const items = cart.data?.items ?? [];
   const { products, isPending: productsPending } = useProductsById(items.map((item) => item.productId));
   const [actionError, setActionError] = useState<string | null>(null);
+  const [addressIndex, setAddressIndex] = useState(0);
+  // El administrador puede restringir comercialmente a un comprador: conserva su carrito, pero no puede confirmar pedidos
+  const restricted = profile.data?.commercialStatus === "RESTRICTED";
 
   const checkout = useMutation({
-    mutationFn: ordersApi.checkout,
+    mutationFn: () => ordersApi.checkout(addressIndex),
     onSuccess: (order) => {
       // El backend vacía el carrito al confirmar el pedido
       queryClient.setQueryData<Cart>(cartKey(user.id), { buyerId: user.id, items: [] });
@@ -151,14 +154,12 @@ export function CartPage() {
             <span className="font-medium">Total</span>
             <span className="font-display text-2xl font-semibold tabular-nums">{productsPending ? "…" : formatMoney(total)}</span>
           </div>
-          {profile.data && (
-            <div className="flex gap-2 rounded-xl bg-surface-2/60 p-3 text-sm">
-              <Home className="mt-0.5 size-4 shrink-0 text-brand-fg" />
-              <div>
-                <p className="font-medium">Entrega en tu dirección principal</p>
-                <p className="text-muted">{formatAddress(profile.data.primaryAddress)}</p>
-              </div>
-            </div>
+          {profile.data && <DeliveryAddressPicker buyer={profile.data} value={addressIndex} onChange={setAddressIndex} />}
+          {restricted && (
+            <Alert tone="error">
+              Tu cuenta tiene una restricción comercial y por ahora no puedes confirmar pedidos. Comunícate con el administrador; tu carrito
+              se conserva.
+            </Alert>
           )}
           {unavailable.length > 0 && <Alert tone="error">Quita los productos que ya no están disponibles para continuar.</Alert>}
           {checkout.error && <Alert tone="error">{errorMessage(checkout.error, "No se pudo confirmar el pedido.")}</Alert>}
@@ -166,7 +167,7 @@ export function CartPage() {
             size="lg"
             className="w-full"
             loading={checkout.isPending}
-            disabled={unavailable.length > 0 || busy || productsPending}
+            disabled={restricted || unavailable.length > 0 || busy || productsPending}
             onClick={() => checkout.mutate()}
           >
             Confirmar pedido <ArrowRight className="size-4" />

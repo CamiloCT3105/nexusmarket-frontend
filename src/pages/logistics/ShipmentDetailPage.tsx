@@ -16,6 +16,7 @@ import { useIsSupervisor } from "@/features/admin/hooks";
 import { useAllWarehouses } from "@/features/logistics/hooks";
 import { ORDER_STATUS, SHIPMENT_NEXT, SHIPMENT_STATUS, SHIPMENT_STEPS } from "@/features/orders/labels";
 import { ShipmentTimeline } from "@/features/orders/ShipmentTimeline";
+import { ShippingAddressCard } from "@/features/orders/ShippingAddressCard";
 import { cn } from "@/lib/cn";
 import { errorMessage } from "@/lib/errors";
 import { formatDateTime, shortId } from "@/lib/format";
@@ -209,7 +210,8 @@ export function ShipmentDetailPage() {
           </Card>
         </div>
 
-        <div className="lg:sticky lg:top-24 lg:h-fit">
+        <div className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
+          <ShippingAddressCard address={orderData.shippingAddress} title="Entregar en" />
           {readOnly ? (
             <Card className="p-5 text-sm">
               <p className="font-semibold">Estado: {SHIPMENT_STATUS[data.status].label}</p>

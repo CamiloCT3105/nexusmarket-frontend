@@ -17,6 +17,7 @@ import { ORDER_STATUS, RETURN_STATUS, SHIPMENT_STATUS } from "@/features/orders/
 import { OrderProgress } from "@/features/orders/OrderProgress";
 import { ReturnForm } from "@/features/orders/ReturnForm";
 import { ShipmentTimeline } from "@/features/orders/ShipmentTimeline";
+import { ShippingAddressCard } from "@/features/orders/ShippingAddressCard";
 import { errorMessage, notFoundAsNull } from "@/lib/errors";
 import { formatDateTime, formatMoney, shortId } from "@/lib/format";
 
@@ -296,6 +297,7 @@ export function OrderDetailPage() {
 
         <div className="space-y-4">
           <PaymentCard order={order} />
+          <ShippingAddressCard address={order.shippingAddress} />
           <InvoiceCard order={order} />
           <ShipmentCard order={order} />
         </div>

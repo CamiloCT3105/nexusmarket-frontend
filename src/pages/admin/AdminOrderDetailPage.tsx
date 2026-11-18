@@ -18,6 +18,7 @@ import { ProductArt } from "@/features/catalog/ProductArt";
 import { useAllWarehouses } from "@/features/logistics/hooks";
 import { ORDER_STATUS, RETURN_STATUS, SHIPMENT_STATUS } from "@/features/orders/labels";
 import { OrderProgress } from "@/features/orders/OrderProgress";
+import { ShippingAddressCard } from "@/features/orders/ShippingAddressCard";
 import { errorMessage, notFoundAsNull } from "@/lib/errors";
 import { formatDateTime, formatMoney, shortId } from "@/lib/format";
 
@@ -238,6 +239,7 @@ export function AdminOrderDetailPage() {
         </Card>
 
         <div className="space-y-4">
+          <ShippingAddressCard address={data.shippingAddress} />
           <InvoiceCard order={data} />
           <ShipmentCard order={data} />
           <ReturnsCard order={data} names={names} />

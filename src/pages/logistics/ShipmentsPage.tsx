@@ -81,6 +81,11 @@ function PaidOrderCard({ order, names, locations }: { order: Order; names: Map<s
             ))}
           </ul>
           <p className="mt-2 text-xs text-muted">Sale de: {origins.join(" · ")}</p>
+          {order.shippingAddress && (
+            <p className="mt-0.5 text-xs text-muted">
+              Entregar en: {order.shippingAddress.street}, {order.shippingAddress.city}
+            </p>
+          )}
         </div>
         <div className="shrink-0 sm:text-right">
           {shipment.isPending ? (
