@@ -15,6 +15,7 @@ import { AdminReturnsPage } from "@/pages/admin/AdminReturnsPage";
 import { CreateUserPage } from "@/pages/admin/CreateUserPage";
 import { UserDetailPage } from "@/pages/admin/UserDetailPage";
 import { UsersPage } from "@/pages/admin/UsersPage";
+import { ReportsPage } from "@/pages/reports/ReportsPage";
 import { CartPage } from "@/pages/buyer/CartPage";
 import { InvoiceDetailPage } from "@/pages/buyer/InvoiceDetailPage";
 import { InvoicesPage } from "@/pages/buyer/InvoicesPage";
@@ -36,9 +37,10 @@ import { SellerReturnsPage } from "@/pages/seller/SellerReturnsPage";
 const buyer = (element: ReactElement) => <RequireRole roles={["BUYER"]}>{element}</RequireRole>;
 const seller = (element: ReactElement) => <RequireRole roles={["SELLER"]}>{element}</RequireRole>;
 const admin = (element: ReactElement) => <RequireRole roles={["ADMIN"]}>{element}</RequireRole>;
-// Envíos: el operador logístico y el administrador
-const shipping = (element: ReactElement) => <RequireRole roles={["LOGISTICS_OPERATOR", "ADMIN"]}>{element}</RequireRole>;
-const invoices = (element: ReactElement) => <RequireRole roles={["BUYER", "ADMIN"]}>{element}</RequireRole>;
+// El supervisor consulta las mismas pantallas que el administrador, sin acciones
+const staff = (element: ReactElement) => <RequireRole roles={["ADMIN", "SUPERVISOR"]}>{element}</RequireRole>;
+const shipping = (element: ReactElement) => <RequireRole roles={["LOGISTICS_OPERATOR", "ADMIN", "SUPERVISOR"]}>{element}</RequireRole>;
+const invoices = (element: ReactElement) => <RequireRole roles={["BUYER", "ADMIN", "SUPERVISOR"]}>{element}</RequireRole>;
 
 export const router = createBrowserRouter([
   // Acceso (solo sin sesión)
@@ -69,24 +71,25 @@ export const router = createBrowserRouter([
           { path: "/perfil", element: buyer(<ProfilePage />) },
           { path: "/carrito", element: buyer(<CartPage />) },
           // Pedidos y devoluciones: misma ruta, pantalla según el rol
-          { path: "/pedidos", element: <ByRole views={{ BUYER: <OrdersPage />, SELLER: <SellerOrdersPage />, ADMIN: <AdminOrdersPage /> }} /> },
-          { path: "/pedidos/:id", element: <ByRole views={{ BUYER: <OrderDetailPage />, SELLER: <SellerOrderDetailPage />, ADMIN: <AdminOrderDetailPage /> }} /> },
+          { path: "/pedidos", element: <ByRole views={{ BUYER: <OrdersPage />, SELLER: <SellerOrdersPage />, ADMIN: <AdminOrdersPage />, SUPERVISOR: <AdminOrdersPage /> }} /> },
+          { path: "/pedidos/:id", element: <ByRole views={{ BUYER: <OrderDetailPage />, SELLER: <SellerOrderDetailPage />, ADMIN: <AdminOrderDetailPage />, SUPERVISOR: <AdminOrderDetailPage /> }} /> },
           { path: "/facturas", element: invoices(<InvoicesPage />) },
           { path: "/facturas/:id", element: invoices(<InvoiceDetailPage />) },
-          { path: "/devoluciones", element: <ByRole views={{ BUYER: <ReturnsPage />, SELLER: <SellerReturnsPage />, ADMIN: <AdminReturnsPage /> }} /> },
+          { path: "/devoluciones", element: <ByRole views={{ BUYER: <ReturnsPage />, SELLER: <SellerReturnsPage />, ADMIN: <AdminReturnsPage />, SUPERVISOR: <AdminReturnsPage /> }} /> },
           // Vendedor
           { path: "/productos", element: seller(<SellerProductsPage />) },
           { path: "/productos/nuevo", element: seller(<ProductFormPage />) },
           { path: "/productos/:id", element: seller(<SellerProductDetailPage />) },
           // Inventario: el vendedor ve sus bodegas; el operador logístico y el administrador, todas
-          { path: "/inventario", element: <ByRole views={{ SELLER: <InventoryPage />, LOGISTICS_OPERATOR: <LogisticsInventoryPage />, ADMIN: <LogisticsInventoryPage /> }} /> },
+          { path: "/inventario", element: <ByRole views={{ SELLER: <InventoryPage />, LOGISTICS_OPERATOR: <LogisticsInventoryPage />, ADMIN: <LogisticsInventoryPage />, SUPERVISOR: <LogisticsInventoryPage /> }} /> },
           // Operador logístico y administrador
           { path: "/envios", element: shipping(<ShipmentsPage />) },
           { path: "/envios/:id", element: shipping(<ShipmentDetailPage />) },
-          // Administrador
-          { path: "/usuarios", element: admin(<UsersPage />) },
+          // Administrador (y supervisor, en modo consulta)
+          { path: "/usuarios", element: staff(<UsersPage />) },
           { path: "/usuarios/nuevo", element: admin(<CreateUserPage />) },
-          { path: "/usuarios/:id", element: admin(<UserDetailPage />) },
+          { path: "/usuarios/:id", element: staff(<UserDetailPage />) },
+          { path: "/reportes", element: staff(<ReportsPage />) },
           { path: "*", element: <NotFoundPage /> },
         ],
       },

@@ -1,6 +1,12 @@
 import { useQueries } from "@tanstack/react-query";
 import { usersApi } from "@/api/admin";
+import { useCurrentUser } from "@/auth/AuthContext";
 import type { User } from "@/api/types";
+
+// El supervisor consulta lo mismo que el administrador, pero sin acciones
+export function useIsSupervisor(): boolean {
+  return useCurrentUser().role === "SUPERVISOR";
+}
 
 // Usuarios por id (nombres de compradores en pedidos, facturas y devoluciones). Comparte caché con el detalle.
 export function useUsersById(ids: string[]) {

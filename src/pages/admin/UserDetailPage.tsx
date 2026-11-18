@@ -17,6 +17,7 @@ import { Input, Select } from "@/components/ui/Field";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Spinner } from "@/components/ui/Spinner";
 import { Confirm } from "@/features/admin/Confirm";
+import { useIsSupervisor } from "@/features/admin/hooks";
 import { ALL_ROLES, COMMERCIAL_STATUS, ROLE_IMPLICATION, USER_STATUS, initials } from "@/features/admin/labels";
 import { formatAddress } from "@/features/buyer/AddressForm";
 import { STATUS_LABEL, STATUS_TONE } from "@/features/catalog/productLabels";
@@ -142,6 +143,7 @@ function RoleSection({ user, isMe }: { user: User; isMe: boolean }) {
 }
 
 function SellerWarehouses({ userId }: { userId: string }) {
+  const readOnly = useIsSupervisor();
   const queryClient = useQueryClient();
   const [location, setLocation] = useState("");
   const [error, setError] = useState<string | undefined>();
@@ -189,6 +191,7 @@ function SellerWarehouses({ userId }: { userId: string }) {
           ))}
         </ul>
       )}
+      {!readOnly && (
       <form onSubmit={submit} noValidate className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <div className="flex-1">
           <Input
@@ -203,6 +206,7 @@ function SellerWarehouses({ userId }: { userId: string }) {
           Crear bodega
         </Button>
       </form>
+      )}
       {create.error && <Alert tone="error">{errorMessage(create.error, "No se pudo crear la bodega.")}</Alert>}
     </div>
   );
@@ -241,6 +245,7 @@ function SellerProducts({ userId }: { userId: string }) {
 
 // Un usuario con rol vendedor necesita que el administrador habilite su cuenta antes de vender
 function SellerSection({ user }: { user: User }) {
+  const readOnly = useIsSupervisor();
   const queryClient = useQueryClient();
   const seller = useQuery({
     queryKey: ["seller", user.id],
@@ -261,9 +266,11 @@ function SellerSection({ user }: { user: User }) {
         <div className="space-y-3">
           <Alert tone="info">Su cuenta de vendedor aún no está habilitada: no puede publicar productos ni crear bodegas.</Alert>
           {onboard.error && <Alert tone="error">{errorMessage(onboard.error)}</Alert>}
-          <Button loading={onboard.isPending} onClick={() => onboard.mutate()}>
-            Habilitar como vendedor
-          </Button>
+          {!readOnly && (
+            <Button loading={onboard.isPending} onClick={() => onboard.mutate()}>
+              Habilitar como vendedor
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-5">
@@ -280,6 +287,7 @@ function SellerSection({ user }: { user: User }) {
 }
 
 function BuyerSection({ user }: { user: User }) {
+  const readOnly = useIsSupervisor();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState(false);
   const buyer = useQuery({
@@ -320,7 +328,7 @@ function BuyerSection({ user }: { user: User }) {
               <Badge tone={COMMERCIAL_STATUS[current].tone}>{COMMERCIAL_STATUS[current].label}</Badge>
               <span className="ml-2 text-muted">{COMMERCIAL_STATUS[current].help}</span>
             </p>
-            {confirming ? (
+            {readOnly ? null : confirming ? (
               <Confirm
                 confirmLabel={target === "RESTRICTED" ? "Sí, restringir" : "Sí, quitar restricción"}
                 loading={change.isPending}
@@ -350,6 +358,7 @@ function BuyerSection({ user }: { user: User }) {
 export function UserDetailPage() {
   const { id = "" } = useParams();
   const me = useCurrentUser();
+  const readOnly = useIsSupervisor();
   const location = useLocation();
   const created = (location.state as { created?: boolean } | null)?.created === true;
   const user = useQuery({ queryKey: ["user", id], queryFn: ({ signal }) => usersApi.get(id, signal) });
@@ -414,8 +423,19 @@ export function UserDetailPage() {
           )}
         </div>
         <div className="space-y-6">
-          <AccountSection user={data} isMe={isMe} />
-          <RoleSection key={data.role} user={data} isMe={isMe} />
+          {readOnly ? (
+            <Section icon={<ShieldCheck className="size-4" />} title="Cuenta">
+              <p className="text-sm">
+                <Badge tone={USER_STATUS[data.status].tone}>{USER_STATUS[data.status].label}</Badge>
+                <span className="ml-2 text-muted">{ROLE_IMPLICATION[data.role]}</span>
+              </p>
+            </Section>
+          ) : (
+            <>
+              <AccountSection user={data} isMe={isMe} />
+              <RoleSection key={data.role} user={data} isMe={isMe} />
+            </>
+          )}
         </div>
       </div>
     </div>

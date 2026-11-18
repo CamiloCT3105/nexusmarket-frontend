@@ -71,7 +71,7 @@ function Decision({ request, admin }: { request: ReturnRequest; admin: boolean }
 }
 
 // Solicitudes de devolución. El vendedor ve las de sus productos; el administrador, todas.
-export function ReturnRequests({ admin = false }: { admin?: boolean }) {
+export function ReturnRequests({ admin = false, readOnly = false }: { admin?: boolean; readOnly?: boolean }) {
   const [params, setParams] = useSearchParams();
   // Por defecto, lo que espera una decisión
   const raw = params.get("estado");
@@ -137,7 +137,7 @@ export function ReturnRequests({ admin = false }: { admin?: boolean }) {
                   Pedido #{shortId(request.orderId)}
                 </Link>
               </p>
-              {request.status === "REQUESTED" && <Decision request={request} admin={admin} />}
+              {request.status === "REQUESTED" && !readOnly && <Decision request={request} admin={admin} />}
             </Card>
           ))}
           <div className="pt-4">

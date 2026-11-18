@@ -11,7 +11,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { Pagination } from "@/components/ui/Pagination";
 import { Segmented } from "@/components/ui/Segmented";
-import { useUsersById } from "@/features/admin/hooks";
+import { useIsSupervisor, useUsersById } from "@/features/admin/hooks";
 import { ORDER_STATUS, ORDER_STEPS } from "@/features/orders/labels";
 import { cn } from "@/lib/cn";
 import { errorMessage } from "@/lib/errors";
@@ -22,6 +22,7 @@ type Filter = OrderStatus | "ALL";
 
 // Todos los pedidos de la plataforma, con filtro por estado y por comprador (?comprador=)
 export function AdminOrdersPage() {
+  const readOnly = useIsSupervisor();
   const [params, setParams] = useSearchParams();
   const status = ORDER_STEPS.find((step) => step === params.get("estado"));
   const buyerId = params.get("comprador") ?? undefined;
@@ -51,7 +52,14 @@ export function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Pedidos" description="Todos los pedidos de la plataforma. Desde el detalle se genera la factura de los pedidos pagados." />
+      <PageHeader
+        title="Pedidos"
+        description={
+          readOnly
+            ? "Todos los pedidos de la plataforma, con su factura, envío y devoluciones."
+            : "Todos los pedidos de la plataforma. Desde el detalle se genera la factura de los pedidos pagados."
+        }
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <Segmented<Filter>

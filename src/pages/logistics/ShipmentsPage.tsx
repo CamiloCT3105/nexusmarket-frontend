@@ -14,6 +14,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { Segmented } from "@/components/ui/Segmented";
 import { Spinner } from "@/components/ui/Spinner";
 import { useProductsById } from "@/features/buyer/hooks";
+import { useIsSupervisor } from "@/features/admin/hooks";
 import { useAllWarehouses } from "@/features/logistics/hooks";
 import { SHIPMENT_STATUS, SHIPMENT_STEPS } from "@/features/orders/labels";
 import { cn } from "@/lib/cn";
@@ -44,6 +45,7 @@ function usePage(params: URLSearchParams, setParams: ReturnType<typeof useSearch
 function PaidOrderCard({ order, names, locations }: { order: Order; names: Map<string, string>; locations: Map<string, string> }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const readOnly = useIsSupervisor();
   const shipment = useQuery({
     queryKey: ["shipment", "order", order.id],
     queryFn: ({ signal }) => notFoundAsNull(shipmentsApi.byOrder(order.id, signal)),
@@ -87,6 +89,8 @@ function PaidOrderCard({ order, names, locations }: { order: Order; names: Map<s
             <Link to={`/envios/${shipment.data.id}`} className="inline-flex items-center gap-1 text-sm text-brand-fg hover:underline">
               Guía <span className="font-mono">{shipment.data.trackingCode}</span> <ChevronRight className="size-4" />
             </Link>
+          ) : readOnly ? (
+            <Badge tone="warning">Sin envío</Badge>
           ) : (
             <Button icon={<Truck className="size-4" />} loading={create.isPending} onClick={() => create.mutate()}>
               Crear envío
@@ -193,13 +197,21 @@ function ShipmentList({ status }: { status: ShipmentStatus | undefined }) {
 }
 
 export function ShipmentsPage() {
+  const readOnly = useIsSupervisor();
   const [params, setParams] = useSearchParams();
   const raw = params.get("vista");
   const view: View = raw === "todos" ? "todos" : (SHIPMENT_STEPS.find((step) => step === raw) ?? "pagados");
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Envíos" description="Crea el envío de cada pedido pagado y actualiza su seguimiento hasta la entrega." />
+      <PageHeader
+        title="Envíos"
+        description={
+          readOnly
+            ? "Seguimiento de los pedidos pagados y de cada envío hasta la entrega."
+            : "Crea el envío de cada pedido pagado y actualiza su seguimiento hasta la entrega."
+        }
+      />
       <Segmented<View>
         label="Vista"
         value={view}

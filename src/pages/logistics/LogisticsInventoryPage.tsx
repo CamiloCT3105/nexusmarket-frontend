@@ -18,7 +18,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { Segmented } from "@/components/ui/Segmented";
 import { useCurrentUser } from "@/auth/AuthContext";
 import { Confirm } from "@/features/admin/Confirm";
-import { useUsersById } from "@/features/admin/hooks";
+import { useIsSupervisor, useUsersById } from "@/features/admin/hooks";
 import { useProductsById } from "@/features/buyer/hooks";
 import { useAllWarehouses } from "@/features/logistics/hooks";
 import { InventoryList } from "@/features/seller/InventoryList";
@@ -64,6 +64,7 @@ function InboundCard({ warehouses, onClose }: { warehouses: Warehouse[]; onClose
 }
 
 function StockView({ warehouses }: { warehouses: Warehouse[] }) {
+  const readOnly = useIsSupervisor();
   const [params, setParams] = useSearchParams();
   const [adding, setAdding] = useState(false);
   const warehouseId = warehouses.find((warehouse) => warehouse.id === params.get("bodega"))?.id;
@@ -102,7 +103,7 @@ function StockView({ warehouses }: { warehouses: Warehouse[] }) {
             ]}
           />
         </div>
-        {!adding && (
+        {!adding && !readOnly && (
           <Button icon={<PackagePlus className="size-4" />} onClick={() => setAdding(true)}>
             Registrar ingreso
           </Button>
@@ -129,6 +130,7 @@ function StockView({ warehouses }: { warehouses: Warehouse[] }) {
             products={products}
             warehouses={new Map(warehouses.map((warehouse) => [warehouse.id, warehouse]))}
             productHref={(id) => `/catalogo/${id}`}
+            readOnly={readOnly}
           />
           <div className="pt-4">
             <Pagination
@@ -266,14 +268,15 @@ function Reassign({ warehouse, onClose }: { warehouse: Warehouse; onClose: () =>
 }
 
 function WarehousesView({ warehouses }: { warehouses: Warehouse[] }) {
-  const isAdmin = useCurrentUser().role === "ADMIN";
+  const role = useCurrentUser().role;
+  const isAdmin = role === "ADMIN";
   const [, setParams] = useSearchParams();
   const [type, setType] = useState<WarehouseType | "ALL">("ALL");
   const [creating, setCreating] = useState(false);
   const [reassigning, setReassigning] = useState<string | null>(null);
   const shown = type === "ALL" ? warehouses : warehouses.filter((warehouse) => warehouse.type === type);
-  // El operador logístico no puede consultar usuarios: solo el administrador ve el nombre del dueño
-  const owners = useUsersById(isAdmin ? warehouses.flatMap((warehouse) => (warehouse.sellerId ? [warehouse.sellerId] : [])) : []);
+  // El operador logístico no puede consultar usuarios: el administrador y el supervisor ven el nombre del dueño
+  const owners = useUsersById(isAdmin || role === "SUPERVISOR" ? warehouses.flatMap((warehouse) => (warehouse.sellerId ? [warehouse.sellerId] : [])) : []);
 
   return (
     <div className="space-y-4">
@@ -343,7 +346,8 @@ function WarehousesView({ warehouses }: { warehouses: Warehouse[] }) {
 
 // Operador logístico y administrador (el administrador además crea y reasigna bodegas)
 export function LogisticsInventoryPage() {
-  const isAdmin = useCurrentUser().role === "ADMIN";
+  const role = useCurrentUser().role;
+  const isAdmin = role === "ADMIN";
   const [params, setParams] = useSearchParams();
   const view: View = params.get("vista") === "bodegas" ? "bodegas" : "existencias";
   const warehouses = useAllWarehouses();
@@ -355,7 +359,9 @@ export function LogisticsInventoryPage() {
         description={
           isAdmin
             ? "Existencias en todas las bodegas. Crea bodegas del marketplace o de vendedores y reasígnalas."
-            : "Existencias en todas las bodegas del marketplace y de los vendedores."
+            : role === "SUPERVISOR"
+              ? "Consulta de existencias en todas las bodegas del marketplace y de los vendedores."
+              : "Existencias en todas las bodegas del marketplace y de los vendedores."
         }
         actions={
           <Segmented<View>
