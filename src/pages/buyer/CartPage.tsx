@@ -98,7 +98,13 @@ export function CartPage() {
             <Card key={item.productId} className="flex gap-3 p-3 sm:gap-4 sm:p-4">
               <Link to={`/catalogo/${item.productId}`} className="shrink-0" aria-label={product?.name ?? "Ver producto"}>
                 {product ? (
-                  <ProductArt id={product.id} type={product.type} name={product.name} className="size-16 rounded-xl sm:size-24" />
+                  <ProductArt
+                    id={product.id}
+                    type={product.type}
+                    name={product.name}
+                    imageUrl={product.imageUrl}
+                    className="size-16 rounded-xl sm:size-24"
+                  />
                 ) : (
                   <div className="size-16 animate-pulse rounded-xl bg-surface-2 sm:size-24" />
                 )}

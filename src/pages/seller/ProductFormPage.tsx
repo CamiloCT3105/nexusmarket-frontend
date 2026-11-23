@@ -12,18 +12,22 @@ import { Input, Select, Textarea } from "@/components/ui/Field";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { TYPE_LABEL } from "@/features/catalog/productLabels";
 import { useSellerProfile } from "@/features/seller/hooks";
+import { ImageUrlField } from "@/features/seller/ImageUrlField";
 import { SellerRequired } from "@/features/seller/SellerRequired";
 import { errorMessage } from "@/lib/errors";
+import { imageUrlError } from "@/lib/imageUrl";
 
-type Errors = Partial<Record<"name" | "price", string>>;
+type Errors = Partial<Record<"name" | "price" | "imageUrl", string>>;
 
 // Mismas reglas que el backend: nombre obligatorio, precio > 0 con máximo dos decimales
-function validate(name: string, price: string): Errors {
+function validate(name: string, price: string, imageUrl: string): Errors {
   const errors: Errors = {};
   if (!name.trim()) errors.name = "El nombre es obligatorio.";
   const value = Number(price);
   if (!price.trim() || !Number.isFinite(value) || value <= 0) errors.price = "El precio debe ser mayor a cero.";
   else if (Number(value.toFixed(2)) !== value) errors.price = "El precio admite como máximo dos decimales.";
+  const imageError = imageUrlError(imageUrl);
+  if (imageError) errors.imageUrl = imageError;
   return errors;
 }
 
@@ -35,6 +39,7 @@ export function ProductFormPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [type, setType] = useState<ProductType>("PHYSICAL");
+  const [imageUrl, setImageUrl] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
   const create = useMutation({
@@ -48,10 +53,17 @@ export function ProductFormPage() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const found = validate(name, price);
+    const found = validate(name, price, imageUrl);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
-    create.mutate({ name: name.trim(), description: description.trim(), price: Number(price), type });
+    const image = imageUrl.trim();
+    create.mutate({
+      name: name.trim(),
+      description: description.trim(),
+      price: Number(price),
+      type,
+      ...(image ? { imageUrl: image } : {}),
+    });
   };
 
   const back = (
@@ -109,6 +121,7 @@ export function ProductFormPage() {
               options={(Object.keys(TYPE_LABEL) as ProductType[]).map((value) => ({ value, label: TYPE_LABEL[value] }))}
             />
           </div>
+          <ImageUrlField value={imageUrl} onChange={setImageUrl} error={errors.imageUrl} previewId="nuevo" name={name} type={type} />
           {create.error && <Alert tone="error">{errorMessage(create.error, "No se pudo crear el producto.")}</Alert>}
           <div className="flex justify-end gap-2 pt-2">
             <Link to="/productos">

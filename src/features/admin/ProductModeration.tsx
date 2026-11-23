@@ -19,10 +19,12 @@ const MODERATION: Record<ProductStatus, { action: string; effect: string }> = {
 // El administrador puede cambiar el estado de cualquier producto (por ejemplo, suspender uno que incumple las normas)
 export function ProductModeration({ product }: { product: Product }) {
   const queryClient = useQueryClient();
-  const [target, setTarget] = useState<ProductStatus | null>(null);
+  const [target, setTarget] = useState<ProductStatus | "REMOVE_IMAGE" | null>(null);
   const seller = useUsersById([product.sellerId]).get(product.sellerId);
   const change = useMutation({
-    mutationFn: (status: ProductStatus) => sellerProductsApi.setStatus(product.id, status),
+    // Quitar la foto sirve para retirar una imagen inapropiada sin suspender el producto
+    mutationFn: (next: ProductStatus | "REMOVE_IMAGE") =>
+      next === "REMOVE_IMAGE" ? sellerProductsApi.setImage(product.id, null) : sellerProductsApi.setStatus(product.id, next),
     onSuccess: (updated) => {
       queryClient.setQueryData(["product", product.id], updated);
       void queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -43,7 +45,18 @@ export function ProductModeration({ product }: { product: Product }) {
           {seller?.fullName ?? "ver perfil"}
         </Link>
       </p>
-      {target ? (
+      {target === "REMOVE_IMAGE" ? (
+        <Confirm
+          confirmLabel="Sí, quitar la foto"
+          danger
+          loading={change.isPending}
+          error={change.error}
+          onConfirm={() => change.mutate("REMOVE_IMAGE")}
+          onCancel={() => setTarget(null)}
+        >
+          ¿Quitar la foto de “{product.name}”? El producto sigue a la venta con la ilustración; el vendedor puede poner otra.
+        </Confirm>
+      ) : target ? (
         <Confirm
           confirmLabel={`Sí, ${MODERATION[target].action.toLowerCase()}`}
           danger={target !== "PUBLISHED"}
@@ -62,6 +75,11 @@ export function ProductModeration({ product }: { product: Product }) {
               {MODERATION[status].action}
             </Button>
           ))}
+          {product.imageUrl && (
+            <Button size="sm" variant="secondary" onClick={() => setTarget("REMOVE_IMAGE")}>
+              Quitar foto
+            </Button>
+          )}
         </div>
       )}
     </Card>

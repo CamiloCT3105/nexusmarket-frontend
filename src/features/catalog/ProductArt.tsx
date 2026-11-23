@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { Download, Package } from "lucide-react";
 import type { ProductType } from "@/api/types";
 import { cn } from "@/lib/cn";
 
-// El backend aún no guarda imágenes de producto: se muestra una ilustración por tipo.
 // Variación de tono determinística por id, siempre dentro de la gama morada (sin mezclar con verde).
 function hueFor(id: string): number {
   let hash = 0;
@@ -10,7 +10,41 @@ function hueFor(id: string): number {
   return 255 + (hash % 35); // 255°–290°: violetas
 }
 
-export function ProductArt({ id, type, name, className }: { id: string; type: ProductType; name: string; className?: string }) {
+type Props = {
+  id: string;
+  type: ProductType;
+  name: string;
+  imageUrl?: string | undefined;
+  // Texto alternativo de la foto. Por defecto vacío: en tarjetas y listas el nombre ya está al lado
+  alt?: string;
+  className?: string;
+};
+
+// Foto del producto si tiene una; si no, o si el enlace falla, una ilustración por tipo.
+export function ProductArt({ imageUrl, ...props }: Props) {
+  // key: si cambia la URL, se vuelve a intentar cargarla (el estado de error se reinicia)
+  return imageUrl ? <ProductPhoto key={imageUrl} imageUrl={imageUrl} {...props} /> : <Illustration {...props} />;
+}
+
+function ProductPhoto({ imageUrl, alt = "", ...props }: Props & { imageUrl: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <Illustration {...props} />;
+  return (
+    <div className={cn("relative overflow-hidden bg-surface-2", props.className)}>
+      <img
+        src={imageUrl}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
+        className="size-full object-cover object-[50%_30%]"
+      />
+    </div>
+  );
+}
+
+function Illustration({ id, type, name, className }: Omit<Props, "imageUrl" | "alt">) {
   const hue = hueFor(id);
   const Icon = type === "DIGITAL" ? Download : Package;
   return (

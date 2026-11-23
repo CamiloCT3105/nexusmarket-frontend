@@ -26,6 +26,7 @@ export type Product = {
   type: ProductType;
   variants: Variant[];
   status: ProductStatus;
+  imageUrl?: string; // URL https de la foto; sin ella se muestra una ilustración
 };
 
 export type ProductSort = "newest" | "price_asc" | "price_desc" | "name_asc";

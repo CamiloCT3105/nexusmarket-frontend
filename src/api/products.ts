@@ -20,7 +20,7 @@ export const productsApi = {
   get: (id: string, signal?: AbortSignal) => api<Product>(`/api/products/${encodeURIComponent(id)}`, { signal }),
 };
 
-export type NewProduct = { name: string; description: string; price: number; type: ProductType };
+export type NewProduct = { name: string; description: string; price: number; type: ProductType; imageUrl?: string };
 
 // Gestión del vendedor (el backend verifica que el producto sea suyo)
 export const sellerProductsApi = {
@@ -29,6 +29,9 @@ export const sellerProductsApi = {
   create: (input: NewProduct) => api<Product>("/api/products", { method: "POST", body: input }),
   addVariant: (id: string, variant: { name: string; value: string }) =>
     api<Product>(`/api/products/${encodeURIComponent(id)}/variants`, { method: "PATCH", body: variant }),
+  // Cambia la foto; null la quita
+  setImage: (id: string, imageUrl: string | null) =>
+    api<Product>(`/api/products/${encodeURIComponent(id)}/image`, { method: "PATCH", body: { imageUrl } }),
   setStatus: (id: string, status: ProductStatus) =>
     api<Product>(`/api/products/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status } }),
 };

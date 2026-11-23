@@ -1,7 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Boxes, ExternalLink, Layers, Plus, ToggleRight } from "lucide-react";
+import { ArrowLeft, Boxes, ExternalLink, ImageIcon, Layers, Plus, ToggleRight } from "lucide-react";
 import { productsApi, sellerProductsApi } from "@/api/products";
 import { inventoryApi } from "@/api/seller";
 import type { Product, ProductStatus, Warehouse } from "@/api/types";
@@ -15,12 +15,14 @@ import { PageLoader } from "@/components/ui/PageLoader";
 import { ProductArt } from "@/features/catalog/ProductArt";
 import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL } from "@/features/catalog/productLabels";
 import { useMyWarehouses } from "@/features/seller/hooks";
+import { ImageUrlField } from "@/features/seller/ImageUrlField";
 import { InventoryList } from "@/features/seller/InventoryList";
 import { STATUS_ACTION } from "@/features/seller/labels";
 import { StockForm } from "@/features/seller/StockForm";
 import { cn } from "@/lib/cn";
 import { errorMessage } from "@/lib/errors";
 import { formatMoney, shortId } from "@/lib/format";
+import { imageUrlError } from "@/lib/imageUrl";
 
 function Section({ icon, title, action, children }: { icon: ReactNode; title: string; action?: ReactNode; children: ReactNode }) {
   return (
@@ -43,6 +45,60 @@ function useSaveProduct(id: string) {
     queryClient.setQueryData(["product", id], product);
     void queryClient.invalidateQueries({ queryKey: ["products"] });
   };
+}
+
+function ImageSection({ product }: { product: Product }) {
+  const save = useSaveProduct(product.id);
+  const current = product.imageUrl ?? "";
+  const [value, setValue] = useState(current);
+  const [error, setError] = useState<string | undefined>();
+  const change = useMutation({
+    mutationFn: (imageUrl: string | null) => sellerProductsApi.setImage(product.id, imageUrl),
+    onSuccess: (updated) => {
+      save(updated);
+      setValue(updated.imageUrl ?? "");
+    },
+  });
+  const trimmed = value.trim();
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const found = imageUrlError(trimmed);
+    setError(found);
+    if (found) return;
+    change.mutate(trimmed === "" ? null : trimmed);
+  };
+
+  return (
+    <Section icon={<ImageIcon className="size-4" />} title="Foto">
+      <form onSubmit={submit} noValidate className="space-y-3">
+        <ImageUrlField value={value} onChange={setValue} error={error} previewId={product.id} name={product.name} type={product.type} />
+        {change.error && <Alert tone="error">{errorMessage(change.error, "No se pudo guardar la foto.")}</Alert>}
+        <div className="flex flex-wrap justify-end gap-2">
+          {current && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              loading={change.isPending && change.variables === null}
+              disabled={change.isPending}
+              onClick={() => change.mutate(null)}
+            >
+              Quitar foto
+            </Button>
+          )}
+          <Button
+            type="submit"
+            size="sm"
+            loading={change.isPending && change.variables !== null}
+            disabled={change.isPending || trimmed === current}
+          >
+            Guardar foto
+          </Button>
+        </div>
+      </form>
+    </Section>
+  );
 }
 
 function StatusSection({ product }: { product: Product }) {
@@ -268,7 +324,13 @@ export function SellerProductDetailPage() {
       {created && <Alert tone="success">Producto creado y publicado. Registra un ingreso de inventario para que se pueda comprar.</Alert>}
 
       <Card className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
-        <ProductArt id={data.id} type={data.type} name={data.name} className="size-20 shrink-0 rounded-2xl sm:size-24" />
+        <ProductArt
+          id={data.id}
+          type={data.type}
+          name={data.name}
+          imageUrl={data.imageUrl}
+          className="size-20 shrink-0 rounded-2xl sm:size-24"
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap gap-1.5">
             <Badge tone={STATUS_TONE[data.status]}>{STATUS_LABEL[data.status]}</Badge>
@@ -295,6 +357,7 @@ export function SellerProductDetailPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <StockSection product={data} warehouses={warehouses.data ?? []} />
         <div className="space-y-6">
+          <ImageSection product={data} />
           <StatusSection product={data} />
           <VariantsSection product={data} />
         </div>
