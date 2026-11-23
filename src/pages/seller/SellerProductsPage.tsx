@@ -127,7 +127,13 @@ export function SellerProductsPage() {
           {data.items.map((product) => (
             <Link key={product.id} to={`/productos/${product.id}`} className="group block">
               <Card className="flex items-center gap-3 p-3 transition-colors group-hover:border-brand/50 sm:gap-4">
-                <ProductArt id={product.id} type={product.type} name={product.name} className="size-14 shrink-0 rounded-xl" />
+                <ProductArt
+                  id={product.id}
+                  type={product.type}
+                  name={product.name}
+                  imageUrl={product.imageUrl}
+                  className="size-14 shrink-0 rounded-xl"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{product.name}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">

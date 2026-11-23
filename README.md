@@ -19,7 +19,7 @@ Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vended
 | Comprador: pedidos (pago simulado, factura y seguimiento del envío)                                   | ✅     |
 | Comprador: facturas imprimibles                                                                       | ✅     |
 | Comprador: devoluciones y reembolsos                                                                  | ✅     |
-| Vendedor: productos, variantes y estado                                                               | ✅     |
+| Vendedor: productos (con foto), variantes y estado                                                    | ✅     |
 | Vendedor: bodegas e inventario (ingresos y unidades dañadas)                                          | ✅     |
 | Vendedor: pedidos con sus productos y devoluciones (aprobar / rechazar)                               | ✅     |
 | Operador logístico: envíos (crear, despachar, entregar) con seguimiento                               | ✅     |
@@ -257,4 +257,4 @@ src/
 - **Las fechas del reporte de ventas se interpretan en UTC en el backend:** un pedido hecho de noche en Colombia (después de las 7 p. m.) cuenta para el día siguiente.
 - **Supervisor en modo consulta con un solo hook (`useIsSupervisor`):** cada acción se oculta donde se dibuja, así las pantallas del administrador sirven para los dos roles sin duplicarlas.
 - **Al imprimir una factura** se ocultan la barra y los botones y se usa siempre la paleta clara.
-- **Sin imágenes de producto** (el backend aún no las guarda): cada producto muestra una ilustración según su tipo.
+- **Fotos de producto por URL:** el vendedor pega el enlace `https` de una imagen y ve una vista previa antes de guardarla (no se suben archivos: el servidor gratuito no los conserva). Si un producto no tiene foto o el enlace falla, se muestra una ilustración según su tipo, nunca una imagen rota. El administrador puede quitar una foto inapropiada sin suspender el producto.

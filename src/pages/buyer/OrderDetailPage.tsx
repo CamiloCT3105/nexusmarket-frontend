@@ -225,7 +225,13 @@ export function OrderDetailPage() {
                   <li key={item.productId} className="py-3 first:pt-0 last:pb-0">
                     <div className="flex items-center gap-3">
                       {product ? (
-                        <ProductArt id={product.id} type={product.type} name={product.name} className="size-14 shrink-0 rounded-lg" />
+                        <ProductArt
+                          id={product.id}
+                          type={product.type}
+                          name={product.name}
+                          imageUrl={product.imageUrl}
+                          className="size-14 shrink-0 rounded-lg"
+                        />
                       ) : (
                         <div className="size-14 shrink-0 animate-pulse rounded-lg bg-surface-2" />
                       )}

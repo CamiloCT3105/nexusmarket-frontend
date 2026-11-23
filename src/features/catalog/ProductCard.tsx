@@ -12,7 +12,7 @@ export function ProductCard({ product, showStatus }: { product: Product; showSta
   return (
     <Link to={`/catalogo/${product.id}`} className="group block focus-visible:outline-none">
       <Card className="flex h-full flex-col overflow-hidden transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-brand/50 group-focus-visible:ring-4 group-focus-visible:ring-ring">
-        <ProductArt id={product.id} type={product.type} name={product.name} className="h-36" />
+        <ProductArt id={product.id} type={product.type} name={product.name} imageUrl={product.imageUrl} className="aspect-[4/3]" />
         <div className="flex flex-1 flex-col gap-2 p-4">
           <div className="flex flex-wrap items-center gap-1.5">
             <Badge tone="brand">{TYPE_LABEL[product.type]}</Badge>
@@ -37,7 +37,7 @@ export function ProductCard({ product, showStatus }: { product: Product; showSta
 export function ProductCardSkeleton() {
   return (
     <Card className="overflow-hidden">
-      <div className="h-36 animate-pulse bg-surface-2" />
+      <div className="aspect-[4/3] animate-pulse bg-surface-2" />
       <div className="space-y-3 p-4">
         <div className="h-4 w-16 animate-pulse rounded-full bg-surface-2" />
         <div className="h-4 w-3/4 animate-pulse rounded bg-surface-2" />

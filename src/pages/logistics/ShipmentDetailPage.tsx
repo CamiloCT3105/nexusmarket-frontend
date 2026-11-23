@@ -183,7 +183,13 @@ export function ShipmentDetailPage() {
                 return (
                   <div key={item.productId} className="flex items-center gap-3 p-4">
                     {product ? (
-                      <ProductArt id={product.id} type={product.type} name={product.name} className="size-12 shrink-0 rounded-xl" />
+                      <ProductArt
+                        id={product.id}
+                        type={product.type}
+                        name={product.name}
+                        imageUrl={product.imageUrl}
+                        className="size-12 shrink-0 rounded-xl"
+                      />
                     ) : (
                       <div className="size-12 shrink-0 animate-pulse rounded-xl bg-surface-2" />
                     )}

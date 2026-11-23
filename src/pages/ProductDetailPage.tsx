@@ -116,7 +116,14 @@ export function ProductDetailPage() {
       {back}
       <div className="grid gap-8 lg:grid-cols-2">
         <Card className="overflow-hidden">
-          <ProductArt id={product.id} type={product.type} name={product.name} className="aspect-[4/3]" />
+          <ProductArt
+            id={product.id}
+            type={product.type}
+            name={product.name}
+            imageUrl={product.imageUrl}
+            alt={product.name}
+            className="aspect-[4/3]"
+          />
         </Card>
 
         <div className="flex flex-col gap-5">
