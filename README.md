@@ -2,6 +2,9 @@
 
 Interfaz web de **NexusMarket**, el marketplace que conecta compradores y vendedores. Consume la API del repositorio [`nexusmarket-backend`](https://github.com/CamiloCT3105/nexusmarket-backend).
 
+> **Demo en vivo:** [nexusmarket-frontend.vercel.app](https://nexusmarket-frontend.vercel.app) · API: [nexusmarket-api.onrender.com/health](https://nexusmarket-api.onrender.com/health)  
+> Plan gratuito: la primera petición tras un rato sin uso puede tardar cerca de un minuto mientras el servidor despierta.
+
 [![CI](https://github.com/CamiloCT3105/nexusmarket-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/CamiloCT3105/nexusmarket-frontend/actions/workflows/ci.yml)
 
 ## Estado actual
@@ -151,7 +154,7 @@ Abre `http://localhost:5173`.
 
 ## Pruebas
 
-**Unitarias y de componentes** (`src/**/*.test.ts(x)`, Vitest + Testing Library, sin backend): validaciones, cliente HTTP (filtros, token, errores, sesión vencida), guardias de ruta por rol, gráficos de reportes, confirmaciones, el formulario de inventario (solo productos del dueño de la bodega) y las devoluciones en modo consulta del supervisor.
+**Unitarias y de componentes** (`src/**/*.test.ts(x)`, Vitest + Testing Library, sin backend): validaciones, cliente HTTP (filtros, token, errores, sesión vencida), guardias de ruta por rol, gráficos de reportes, confirmaciones, el formulario de inventario (solo productos del dueño de la bodega), las devoluciones en modo consulta del supervisor, el aviso del servidor que despierta y las fotos de producto (respaldo a la ilustración si el enlace falla).
 
 **De punta a punta** (`e2e/`, Playwright): recorre la plataforma como lo haría una persona, con varias sesiones en el navegador:
 
